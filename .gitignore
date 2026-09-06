@@ -1,0 +1,13 @@
+node_modules/
+client/dist/
+test-results/
+playwright-report/
+screenshots/
+.codegraph/
+.engram/
+.gentle-ai/
+.opencode/
+.env
+.env.*
+*.local
+.DS_Store
