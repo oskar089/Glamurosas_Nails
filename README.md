@@ -4,20 +4,20 @@ A photo-led nail studio concept with an editorial cream-and-burgundy design. Thi
 
 ## Run locally
 
-Use Node.js **22.12+ or 24+** and npm. The implementation was installed with Node **24.16.0** and npm **11.13.0**.
+Use Node.js **22.12+ or 24+** and pnpm. The implementation was installed with Node **24.16.0** and pnpm **11.8.0**.
 
 From the project root:
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Open **http://127.0.0.1:5173**. The port is fixed; Vite exits rather than silently switching if it is occupied. Stop the server with `Ctrl+C`.
 
 ```sh
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 The production preview runs at **http://127.0.0.1:4173**. Build output is `client/dist/`.
@@ -47,9 +47,9 @@ Navigation includes an accessible mobile menu, a skip link, visible focus states
 ## Verify
 
 ```sh
-npm run format:check
-npm run build
-npm test
+pnpm run format:check
+pnpm run build
+pnpm test
 ```
 
 The Playwright suite runs against the production build at port **4173**, starts and stops its own preview server, and refuses to reuse another running server. Build before testing and leave port 4173 free.
@@ -62,7 +62,7 @@ Tests use **locally installed Microsoft Edge**, with desktop (1440px) and mobile
 
 ```powershell
 $env:PLAYWRIGHT_CHANNEL = "chrome"
-npm test
+pnpm test
 ```
 
 Both browsers must be installed independently; this repository does not install them. Tests cover gallery filters, image fallback, booking validation and privacy, timezone boundaries, safe local review rendering, reload behavior, keyboard navigation, and overflow. Two visual-reference tests need Unsplash and Google Fonts access; other scenarios block those external assets. Screenshots and failure traces go into ignored `test-results/`.
@@ -71,7 +71,7 @@ Both browsers must be installed independently; this repository does not install 
 
 - React **18.3.1**, React DOM **18.3.1**, React Router DOM **7.18.3**.
 - Vite **8.2.2**, React plugin **6.1.1**, JavaScript/JSX, plain CSS. No React Compiler or React 19-only APIs.
-- Playwright **1.63.0** and Prettier **3.6.2**. Exact installed dependencies are locked in `package-lock.json`.
+- Playwright **1.63.0** and Prettier **3.6.2**. Exact installed dependencies are locked in `pnpm-lock.yaml`.
 
 | File                        | Responsibility                                     |
 | --------------------------- | -------------------------------------------------- |
