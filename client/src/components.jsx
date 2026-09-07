@@ -84,13 +84,13 @@ export function Photo({ photo, hero = false, className = "" }) {
       {failed ? (
         <div
           role="img"
-          aria-label={`${photo.alt}. Inspiration photo unavailable.`}
+          aria-label={`${photo.alt}. La imagen de inspiración no está disponible.`}
         >
           <span className="fallback-monogram" aria-hidden="true">
             g.
           </span>
-          <span>Inspiration, in every detail.</span>
-          <small>Photo currently unavailable</small>
+          <span>Inspiración en cada detalle.</span>
+          <small>La imagen no está disponible en este momento</small>
         </div>
       ) : (
         <img
@@ -142,14 +142,14 @@ export function ServiceCard({ service, index }) {
         <div>
           <strong>
             ${service.price}
-            <span> / from</span>
+            <span> / desde</span>
           </strong>
-          <small>{service.duration} min · example</small>
+          <small>{service.duration} min · ejemplo</small>
         </div>
         <Link
           className="icon-link"
           to={`/booking?service=${service.id}`}
-          aria-label={`Try booking ${service.shortName}`}
+          aria-label={`Probar la cita para ${service.shortName}`}
         >
           <Arrow diagonal />
         </Link>
@@ -165,13 +165,13 @@ export function ReviewCard({ review }) {
         <span
           className="stars"
           role="img"
-          aria-label={`${review.rating} out of 5 stars`}
+          aria-label={`${review.rating} de 5 estrellas`}
         >
           {"★".repeat(review.rating)}
           <span className="empty-stars">{"☆".repeat(5 - review.rating)}</span>
         </span>
         <span className="demo-tag">
-          {review.example ? "Example review" : "Your local demo"}
+          {review.example ? "Reseña de ejemplo" : "Tu demostración local"}
         </span>
       </div>
       <blockquote>“{review.comment}”</blockquote>
@@ -192,17 +192,17 @@ export function BookingCallout() {
   return (
     <section className="booking-callout">
       <Sparkle />
-      <p className="eyebrow">A MOMENT, JUST FOR YOU</p>
+      <p className="eyebrow">UN MOMENTO PARA TI</p>
       <h2>
-        Your next chapter.
+        Tu próximo capítulo.
         <br />
-        <em>A fresh set.</em>
+        <em>Un nuevo estilo.</em>
       </h2>
-      <p>Find your inspiration. Make a little space for yourself.</p>
+      <p>Encuentra tu inspiración. Reserva un pequeño espacio para ti.</p>
       <Link className="button button-light" to="/booking">
-        Explore the booking demo <Arrow />
+        Explora la demostración de cita <Arrow />
       </Link>
-      <small>A visual preview. No real appointments are created.</small>
+      <small>Una vista previa visual. No se crean citas reales.</small>
     </section>
   );
 }

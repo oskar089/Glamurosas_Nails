@@ -11,7 +11,7 @@ test("review validation and keyboard rating work; a safe local review is lost on
   await reviews.submit.click();
   await expect(page.getByRole("alert")).toBeVisible();
   await expect(
-    page.getByRole("radio", { name: "1 star", exact: true }),
+    page.getByRole("radio", { name: "1 estrella", exact: true }),
   ).toBeFocused();
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowRight");
@@ -19,14 +19,15 @@ test("review validation and keyboard rating work; a safe local review is lost on
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowRight");
   await expect(
-    page.getByRole("radio", { name: "5 stars", exact: true }),
+    page.getByRole("radio", { name: "5 estrellas", exact: true }),
   ).toBeChecked();
   await reviews.comment.fill("Short");
   await reviews.submit.click();
   await expect(
-    page.getByText("Write at least 10 characters for your demo review.", {
-      exact: true,
-    }),
+    page.getByText(
+      "Escribe al menos 10 caracteres para tu reseña de demostración.",
+      { exact: true },
+    ),
   ).toBeVisible();
   const sample = "A beautiful sample <img src=x onerror=alert(1)> experience.";
   await reviews.comment.fill(sample);
@@ -36,14 +37,14 @@ test("review validation and keyboard rating work; a safe local review is lost on
   });
   await reviews.submit.click();
   await expect(page.getByRole("status")).toContainText(
-    "It is not published and will disappear on reload.",
+    "No se publica y desaparecerá al recargar.",
   );
   await expect(reviews.reviews).toHaveCount(4);
   await expect(reviews.reviews.first()).toContainText(sample);
   await expect(reviews.reviews.first().getByRole("img")).toHaveCount(1);
   await expect(reviews.reviews.first().getByRole("img")).toHaveAttribute(
     "aria-label",
-    "5 out of 5 stars",
+    "5 de 5 estrellas",
   );
   expect(writes).toEqual([]);
   expect(

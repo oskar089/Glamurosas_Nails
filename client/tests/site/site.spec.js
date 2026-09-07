@@ -9,7 +9,7 @@ test("navigation supports keyboards, escape, route focus, and the not-found path
   await site.goto("/");
   await page.keyboard.press("Tab");
   await expect(
-    page.getByRole("link", { name: "Skip to content" }),
+    page.getByRole("link", { name: "Saltar al contenido" }),
   ).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(site.main).toBeFocused();
@@ -20,7 +20,7 @@ test("navigation supports keyboards, escape, route focus, and the not-found path
     await expect(site.menu).toHaveAttribute("aria-expanded", "true");
     await page.keyboard.press("Tab");
     await expect(
-      site.navigation.getByRole("link", { name: "Home", exact: true }),
+      site.navigation.getByRole("link", { name: "Inicio", exact: true }),
     ).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(site.menu).toHaveAttribute("aria-expanded", "false");
@@ -28,11 +28,11 @@ test("navigation supports keyboards, escape, route focus, and the not-found path
     await site.menu.click();
   }
   await site.navigation
-    .getByRole("link", { name: "Contact", exact: true })
+    .getByRole("link", { name: "Contacto", exact: true })
     .click();
   await expect(site.main).toBeFocused();
   await expect(
-    page.getByRole("heading", { name: "Good things are coming." }),
+    page.getByRole("heading", { name: "Buenas cosas están por venir." }),
   ).toBeVisible();
   if (testInfo.project.name === "mobile")
     await expect(site.navigation).toBeHidden();
@@ -41,11 +41,13 @@ test("navigation supports keyboards, escape, route focus, and the not-found path
   );
   await site.goto("/does-not-exist");
   await expect(
-    page.getByRole("heading", { name: "Let’s get you back to beautiful." }),
+    page.getByRole("heading", { name: "Volvamos a lo hermoso." }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Back to home", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Volver al inicio", exact: true })
+    .click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "A little polish.",
+    "Un poco de brillo.",
   );
 });
 
@@ -85,7 +87,7 @@ test("home renders real inspiration assets and captures a visual reference", asy
   await site.goto("/");
   const hero = page
     .getByRole("img", {
-      name: "Black manicure with tortoiseshell accent nails and a gray knit sleeve",
+      name: "Manicura negra con uñas de acento carey y una manga de punto gris",
       exact: true,
     })
     .first();
@@ -143,7 +145,9 @@ test("small screens and reduced motion retain usable controls", async ({
       `${path} at 320px`,
     ).toBe(true);
   }
-  const submit = page.getByRole("button", { name: "Add a demo review" });
+  const submit = page.getByRole("button", {
+    name: "Añadir una reseña de demostración",
+  });
   expect(
     await submit.evaluate(
       (button) => getComputedStyle(button).transitionDuration,

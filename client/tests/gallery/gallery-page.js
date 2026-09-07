@@ -5,7 +5,7 @@ export class GalleryPage extends BasePage {
     super(page);
     this.figures = page.getByRole("figure");
     this.filters = page.getByRole("group", {
-      name: "Filter inspiration by style",
+      name: "Filtrar la inspiración por estilo",
     });
   }
 

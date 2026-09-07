@@ -1,43 +1,43 @@
 export const services = [
   {
     id: "classic",
-    name: "The classic manicure",
-    shortName: "Classic manicure",
+    name: "La manicura clásica",
+    shortName: "Manicura clásica",
     description:
-      "A fresh start for your hands. Shaping, cuticle care, and a beautifully simple polish finish.",
+      "Un nuevo comienzo para tus manos. Limado, cuidado de cutículas y un acabado de esmalte sencillo y elegante.",
     price: 25,
     duration: 40,
-    note: "EFFORTLESS & TIMELESS",
+    note: "SENCILLA Y ATEMPORAL",
   },
   {
     id: "gel",
-    name: "The signature gel",
-    shortName: "Gel manicure",
+    name: "El gel distintivo",
+    shortName: "Manicura de gel",
     description:
-      "Your everyday, elevated. A glossy gel finish in a shade that feels entirely like you.",
+      "Tu día a día, realzado. Un acabado de gel brillante en un tono que se siente totalmente tuyo.",
     price: 38,
     duration: 60,
-    note: "A LITTLE EXTRA SHINE",
+    note: "UN BRILLO EXTRA",
   },
   {
     id: "acrylic",
-    name: "The sculpted set",
-    shortName: "Acrylic extensions",
+    name: "El conjunto esculpido",
+    shortName: "Extensiones acrílicas",
     description:
-      "A new shape, a little length, a fresh perspective. A set designed around your style.",
+      "Una nueva forma, un poco más de longitud y una perspectiva renovada. Un conjunto pensado para tu estilo.",
     price: 55,
     duration: 90,
-    note: "SHAPE YOUR OWN STYLE",
+    note: "DA FORMA A TU ESTILO",
   },
   {
     id: "nail-art",
-    name: "The creative detail",
-    shortName: "Nail art",
+    name: "El detalle creativo",
+    shortName: "Decoración de uñas",
     description:
-      "Tiny canvases, endless possibilities. Personal details, playful accents, and artful finishing touches.",
+      "Pequeños lienzos, posibilidades infinitas. Detalles personales, acentos divertidos y acabados creativos.",
     price: 15,
     duration: 25,
-    note: "MAKE IT PERSONAL · ADD-ON",
+    note: "HAZLO PERSONAL · COMPLEMENTO",
   },
 ];
 
@@ -45,87 +45,87 @@ export const photos = [
   {
     id: "soft-statement",
     image: "photo-1604654894610-df63bc536371",
-    title: "A soft statement",
+    title: "Una declaración sutil",
     category: "gel",
-    alt: "Black manicure with tortoiseshell accent nails and a gray knit sleeve",
+    alt: "Manicura negra con uñas de acento carey y una manga de punto gris",
     position: "center",
   },
   {
     id: "little-details",
     image: "photo-1519014816548-bf5fe059798b",
-    title: "A little love note",
+    title: "Una pequeña nota de amor",
     category: "nail-art",
-    alt: "Red nail art with heart-shaped tips and white love lettering",
+    alt: "Decoración de uñas roja con puntas en forma de corazón y letras blancas",
     position: "center",
   },
   {
     id: "modern-muse",
     image: "photo-1610992015732-2449b76344bc",
-    title: "Modern muse",
+    title: "Musa moderna",
     category: "acrylic",
-    alt: "Soft pink almond-shaped nails resting on a white textured surface",
+    alt: "Uñas rosa suave en forma de almendra sobre una superficie blanca con textura",
     position: "center",
   },
   {
     id: "less-is-more",
     image: "photo-1632345031435-8727f6897d53",
-    title: "The care ritual",
+    title: "El ritual de cuidado",
     category: "classic",
-    alt: "A nail technician applying polish during a manicure",
+    alt: "Una técnica de uñas aplicando esmalte durante una manicura",
     position: "center",
   },
   {
     id: "gloss-edit",
     image: "photo-1604654894610-df63bc536371",
-    title: "The gloss edit",
+    title: "El toque de brillo",
     category: "gel",
-    alt: "Detail of glossy black nails and a tortoiseshell accent",
+    alt: "Detalle de uñas negras brillantes y un acento carey",
     position: "60% 70%",
   },
   {
     id: "artful-moment",
     image: "photo-1632345031435-8727f6897d53",
-    title: "An artful moment",
+    title: "Un momento creativo",
     category: "nail-art",
-    alt: "A detail crop of a manicure session",
+    alt: "Recorte de detalle de una sesión de manicura",
     position: "70% 65%",
   },
 ];
 
 export const categories = [
-  { id: "all", label: "All inspiration" },
-  { id: "acrylic", label: "Acrylic" },
+  { id: "all", label: "Toda la inspiración" },
+  { id: "acrylic", label: "Acrílico" },
   { id: "gel", label: "Gel" },
-  { id: "nail-art", label: "Nail art" },
-  { id: "classic", label: "Classic" },
+  { id: "nail-art", label: "Decoración de uñas" },
+  { id: "classic", label: "Clásica" },
 ];
 
 export const exampleReviews = [
   {
     id: "example-1",
-    name: "The everyday escape",
+    name: "Una pausa cotidiana",
     rating: 5,
     comment:
-      "A little time to slow down, choose a beautiful color, and leave feeling more like myself. Exactly the kind of ritual I love.",
-    style: "Classic manicure",
+      "Un momento para bajar el ritmo, elegir un color bonito y salir sintiéndome más yo misma. Justo el tipo de ritual que me encanta.",
+    style: "Manicura clásica",
     example: true,
   },
   {
     id: "example-2",
-    name: "A detail worth noticing",
+    name: "Un detalle para recordar",
     rating: 5,
     comment:
-      "Soft shades, thoughtful details, and a touch of something different. My inspiration for a set that goes with absolutely everything.",
-    style: "Gel manicure",
+      "Tonos suaves, detalles cuidados y un toque diferente. Mi inspiración para un conjunto que combina con todo.",
+    style: "Manicura de gel",
     example: true,
   },
   {
     id: "example-3",
-    name: "Room to be creative",
+    name: "Espacio para crear",
     rating: 4,
     comment:
-      "I love the idea of bringing a mood board and turning it into something personal. A small canvas for a big bit of personality.",
-    style: "Nail art",
+      "Me encanta la idea de llevar un panel de inspiración y convertirlo en algo personal. Un lienzo pequeño para mucha personalidad.",
+    style: "Decoración de uñas",
     example: true,
   },
 ];
@@ -139,21 +139,22 @@ export const demoTimes = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
 export function validateBooking(values, today = localDateString()) {
   const errors = {};
   if (values.name.trim().length < 2)
-    errors.name = "Enter a name with at least 2 characters.";
+    errors.name = "Introduce un nombre de al menos 2 caracteres.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
-    errors.email = "Enter a valid email address.";
+    errors.email = "Introduce una dirección de correo electrónico válida.";
   if (!services.some((service) => service.id === values.service))
-    errors.service = "Choose a service.";
+    errors.service = "Elige un servicio.";
   const parsedDate = new Date(`${values.date}T12:00:00`);
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(values.date) ||
     Number.isNaN(parsedDate.getTime()) ||
     localDateString(parsedDate) !== values.date
   ) {
-    errors.date = "Choose a valid date.";
+    errors.date = "Elige una fecha válida.";
   } else if (values.date < today) {
-    errors.date = "Choose today or a future date.";
+    errors.date = "Elige hoy o una fecha futura.";
   }
-  if (!demoTimes.includes(values.time)) errors.time = "Choose an example time.";
+  if (!demoTimes.includes(values.time))
+    errors.time = "Elige una hora de ejemplo.";
   return errors;
 }

@@ -13,20 +13,24 @@ import { categories, exampleReviews, photos, services } from "./content";
 import { Booking, Reviews } from "./forms";
 
 const navigation = [
-  { to: "/", label: "Home" },
-  { to: "/services", label: "Services" },
-  { to: "/gallery", label: "Gallery" },
-  { to: "/reviews", label: "Reviews" },
-  { to: "/contact", label: "Contact" },
+  { to: "/", label: "Inicio" },
+  { to: "/services", label: "Servicios" },
+  { to: "/gallery", label: "Galería" },
+  { to: "/reviews", label: "Reseñas" },
+  { to: "/contact", label: "Contacto" },
 ];
 
 function Wordmark() {
   return (
-    <Link to="/" className="wordmark" aria-label="Glamurosas Nails home">
+    <Link
+      to="/"
+      className="wordmark"
+      aria-label="Página de inicio de Glamurosas Nails"
+    >
       <span>
         glamurosas<span className="wordmark-dot">.</span>
       </span>
-      <small>NAILS & SELF-CARE</small>
+      <small>UÑAS Y AUTOCUIDADO</small>
     </Link>
   );
 }
@@ -51,8 +55,8 @@ function Header() {
   return (
     <>
       <div className="demo-banner">
-        A little preview of something beautiful.{" "}
-        <span>Demo website · bookings are not live</span>
+        Una pequeña vista previa de algo hermoso.{" "}
+        <span>Sitio web de demostración · las reservas no están activas</span>
         <Sparkle />
       </div>
       <header
@@ -70,18 +74,20 @@ function Header() {
             className="menu-toggle"
             aria-expanded={open}
             aria-controls="main-navigation"
-            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              open ? "Cerrar menú de navegación" : "Abrir menú de navegación"
+            }
             onClick={() => setOpen(!open)}
           >
             <span
               className={open ? "menu-lines is-open" : "menu-lines"}
               aria-hidden="true"
             />
-            <span>Menu</span>
+            <span>Menú</span>
           </button>
           <nav
             id="main-navigation"
-            aria-label="Main navigation"
+            aria-label="Navegación principal"
             className={`main-navigation ${open ? "is-open" : ""}`}
           >
             {navigation.map((item) => (
@@ -90,7 +96,7 @@ function Header() {
               </NavLink>
             ))}
             <Link className="button button-small" to="/booking">
-              Book your moment <Arrow diagonal />
+              Reserva tu momento <Arrow diagonal />
             </Link>
           </nav>
         </div>
@@ -106,32 +112,32 @@ function Footer() {
         <div>
           <Wordmark />
           <p>
-            A little polish. A lot of possibility.
+            Un poco de brillo. Mucha posibilidad.
             <br />
-            Your self-care story starts here.
+            Tu historia de autocuidado empieza aquí.
           </p>
         </div>
         <div>
-          <h2>Find your inspiration</h2>
-          <nav aria-label="Footer navigation">
-            <Link to="/services">The service menu</Link>
-            <Link to="/gallery">The inspiration edit</Link>
-            <Link to="/booking">Try the booking demo</Link>
+          <h2>Encuentra tu inspiración</h2>
+          <nav aria-label="Navegación del pie de página">
+            <Link to="/services">El menú de servicios</Link>
+            <Link to="/gallery">La edición de inspiración</Link>
+            <Link to="/booking">Prueba la demostración de cita</Link>
           </nav>
         </div>
         <div>
-          <h2>Let’s stay in touch</h2>
-          <p>Salon contact details are coming soon.</p>
+          <h2>Mantengámonos en contacto</h2>
+          <p>Los datos de contacto del salón llegarán pronto.</p>
           <Link className="text-link" to="/contact">
-            About this preview <Arrow diagonal />
+            Acerca de esta vista previa <Arrow diagonal />
           </Link>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} Glamurosas Nails · Visual concept</p>
-        <p>Stock inspiration imagery. Example prices & reviews.</p>
+        <p>© {new Date().getFullYear()} Glamurosas Nails · Concepto visual</p>
+        <p>Imágenes de inspiración de stock. Precios y reseñas de ejemplo.</p>
         <span>
-          MADE FOR YOUR MOMENT <Sparkle />
+          HECHO PARA TU MOMENTO <Sparkle />
         </span>
       </div>
     </footer>
@@ -144,7 +150,9 @@ function RouteEffects() {
   useEffect(() => {
     const name =
       navigation.find((item) => item.to === pathname)?.label ||
-      (pathname === "/booking" ? "Booking demo" : "Page not found");
+      (pathname === "/booking"
+        ? "Demostración de cita"
+        : "Página no encontrada");
     document.title = `${name} | Glamurosas Nails`;
     if (previousPath.current !== pathname) {
       window.scrollTo({ top: 0, behavior: "instant" });
@@ -162,25 +170,26 @@ function Home() {
         <div className="hero-copy">
           <p className="eyebrow">
             <span className="tiny-line" />
-            THE ART OF FEELING GOOD
+            EL ARTE DE SENTIRTE BIEN
           </p>
           <h1>
-            A little polish.
-            <br />A whole new
+            Un poco de brillo.
             <br />
-            <em>feeling.</em>
+            Una nueva forma de
+            <br />
+            <em>sentir.</em>
             <Sparkle />
           </h1>
           <p className="hero-description">
-            Beautiful nails, thoughtful details, and a moment that’s entirely
-            yours. Welcome to Glamurosas Nails.
+            Uñas bonitas, detalles cuidados y un momento que es enteramente
+            tuyo. Te damos la bienvenida a Glamurosas Nails.
           </p>
           <div className="hero-actions">
             <Link className="button" to="/booking">
-              Find your perfect set <Arrow diagonal />
+              Encuentra tu estilo perfecto <Arrow diagonal />
             </Link>
             <Link className="text-link" to="/gallery">
-              Explore the gallery <Arrow />
+              Explora la galería <Arrow />
             </Link>
           </div>
           <div className="hero-footnote">
@@ -188,9 +197,9 @@ function Home() {
               g.
             </span>
             <p>
-              A little self-care.
+              Un poco de autocuidado.
               <br />
-              <strong>A beautiful kind of everyday.</strong>
+              <strong>Una forma hermosa de cada día.</strong>
             </p>
           </div>
         </div>
@@ -198,49 +207,49 @@ function Home() {
           <div className="hero-photo-wrap">
             <Photo photo={photos[0]} hero />
             <div className="hero-photo-label">
-              <span>THE GLAMUROSAS MOOD</span>
+              <span>EL ESTILO GLAMUROSAS</span>
               <p>
-                Soft details.
+                Detalles suaves.
                 <br />
-                <em>Strong impression.</em>
+                <em>Fuerte impresión.</em>
               </p>
               <Arrow diagonal />
             </div>
           </div>
           <div className="hero-seal" aria-hidden="true">
-            <span>NAILS WITH</span>
+            <span>UÑAS CON</span>
             <span className="seal-g">g.</span>
-            <span>PERSONALITY</span>
+            <span>PERSONALIDAD</span>
           </div>
           <p className="image-disclosure">
-            An inspiration image, not salon portfolio work.
+            Una imagen de inspiración, no trabajo del portafolio del salón.
           </p>
           <span className="vertical-note" aria-hidden="true">
-            YOUR STYLE. YOUR LITTLE RITUAL.
+            TU ESTILO. TU PEQUEÑO RITUAL.
           </span>
         </div>
       </section>
       <div className="values-strip">
-        <span>Thoughtful nail care</span>
+        <span>Cuidado de uñas pensado</span>
         <Sparkle />
-        <span>Details that feel like you</span>
+        <span>Detalles que se sienten tuyos</span>
         <Sparkle />
-        <span>A moment to slow down</span>
+        <span>Un momento para frenar</span>
         <Sparkle />
-        <span>Beauty in the everyday</span>
+        <span>La belleza de lo cotidiano</span>
       </div>
       <section className="section container">
         <SectionHeading
-          eyebrow="THE SERVICE MENU"
+          eyebrow="EL MENÚ DE SERVICIOS"
           title={
             <>
-              Your hands. <em>Your signature.</em>
+              Tus manos. <em>Tu firma.</em>
             </>
           }
-          description="From beautifully simple to a little more expressive. Find your kind of finish."
+          description="De lo bellamente sencillo a algo más expresivo. Encuentra tu tipo de acabado."
         >
           <Link className="text-link" to="/services">
-            Explore all services <Arrow />
+            Explora todos los servicios <Arrow />
           </Link>
         </SectionHeading>
         <div className="service-grid">
@@ -249,25 +258,25 @@ function Home() {
           ))}
         </div>
         <p className="section-note">
-          Illustrative prices in USD and estimated durations. Not a live service
-          menu.
+          Precios ilustrativos en USD y duraciones estimadas. No es un menú de
+          servicios en vivo.
         </p>
       </section>
       <section className="inspiration-section">
         <div className="container section">
           <SectionHeading
-            eyebrow="THE INSPIRATION EDIT"
+            eyebrow="LA EDICIÓN DE INSPIRACIÓN"
             title={
               <>
-                Small details.
+                Pequeños detalles.
                 <br />
-                <em>Endless possibilities.</em>
+                <em>Posibilidades infinitas.</em>
               </>
             }
-            description="A mood board for your next little obsession."
+            description="Un panel de inspiración para tu próxima pequeña obsesión."
           >
             <Link className="text-link" to="/gallery">
-              Find your inspiration <Arrow />
+              Encuentra tu inspiración <Arrow />
             </Link>
           </SectionHeading>
           <div className="home-gallery">
@@ -287,23 +296,23 @@ function Home() {
             ))}
           </div>
           <p className="section-note">
-            Curated stock imagery for visual inspiration. These are not examples
-            of our salon’s work.
+            Imágenes de stock seleccionadas como inspiración visual. No son
+            ejemplos del trabajo de nuestro salón.
           </p>
         </div>
       </section>
       <section className="section container">
         <SectionHeading
-          eyebrow="LITTLE WORDS, LOVELY FEELINGS"
+          eyebrow="PALABRAS PEQUEÑAS, SENSACIONES BONITAS"
           title={
             <>
-              The kind of feeling <em>we imagine.</em>
+              El tipo de sensación <em>que imaginamos.</em>
             </>
           }
-          description="Example stories to show how this space will celebrate your experiences."
+          description="Historias de ejemplo para mostrar cómo este espacio celebrará tus experiencias."
         >
           <Link className="text-link" to="/reviews">
-            Explore demo reviews <Arrow />
+            Explora reseñas de demostración <Arrow />
           </Link>
         </SectionHeading>
         <div className="review-grid">
@@ -312,7 +321,8 @@ function Home() {
           ))}
         </div>
         <p className="section-note">
-          Demo copy only. No real customer testimonials or verified ratings.
+          Solo texto de demostración. No hay testimonios reales de clientes ni
+          valoraciones verificadas.
         </p>
       </section>
       <BookingCallout />
@@ -334,27 +344,30 @@ function Services() {
   return (
     <>
       <PageIntro
-        eyebrow="THE SERVICE MENU"
+        eyebrow="EL MENÚ DE SERVICIOS"
         title={
           <>
-            A finish for <em>every feeling.</em>
+            Un acabado para <em>cada sensación.</em>
           </>
         }
       >
         <p>
-          Keep it classic, find your signature shade, or make a little
-          statement.
+          Mantén la clásica, encuentra tu tono característico o haz una pequeña
+          declaración.
           <br />
-          This is where your next set begins.
+          Aquí empieza tu próximo conjunto.
         </p>
       </PageIntro>
-      <section className="container page-section" aria-label="Example services">
+      <section
+        className="container page-section"
+        aria-label="Servicios de ejemplo"
+      >
         <div className="notice">
           <Sparkle />
           <p>
-            <strong>A first look at the menu.</strong> All prices are
-            illustrative USD amounts; durations are examples, not confirmed
-            service details. Nail art is an add-on.
+            <strong>Un primer vistazo al menú.</strong> Todos los precios son
+            montos ilustrativos en USD; las duraciones son ejemplos, no detalles
+            de servicio confirmados. La decoración de uñas es un complemento.
           </p>
         </div>
         <div className="service-grid service-grid-full">
@@ -363,19 +376,19 @@ function Services() {
           ))}
         </div>
         <div className="care-note">
-          <p className="eyebrow">BEFORE YOUR NEXT SET</p>
+          <p className="eyebrow">ANTES DE TU PRÓXIMO CONJUNTO</p>
           <h2>
-            A little thought.
+            Un poco de reflexión.
             <br />
-            <em>A beautiful beginning.</em>
+            <em>Un bello comienzo.</em>
           </h2>
           <p>
-            Use the gallery to explore shapes, colors, and details. The booking
-            demo lets you try choosing a service, date, and time without making
-            a real appointment.
+            Usa la galería para explorar formas, colores y detalles. La
+            demostración de cita te permite probar a elegir un servicio, una
+            fecha y una hora sin hacer una cita real.
           </p>
           <Link className="text-link" to="/gallery">
-            Build your inspiration <Arrow />
+            Construye tu inspiración <Arrow />
           </Link>
         </div>
       </section>
@@ -397,27 +410,28 @@ function Gallery() {
   return (
     <>
       <PageIntro
-        eyebrow="THE INSPIRATION EDIT"
+        eyebrow="LA EDICIÓN DE INSPIRACIÓN"
         title={
           <>
-            Find your next <em>little obsession.</em>
+            Encuentra tu próxima <em>pequeña obsesión.</em>
           </>
         }
       >
         <p>
-          Soft neutrals. Playful details. Something a little unexpected.
-          <br />A curated mood board, ready for your imagination.
+          Neutros suaves. Detalles divertidos. Algo un poco inesperado.
+          <br />
+          Un panel de inspiración seleccionado, listo para tu imaginación.
         </p>
       </PageIntro>
       <section
         className="container page-section"
-        aria-label="Nail inspiration gallery"
+        aria-label="Galería de inspiración de uñas"
       >
         <div className="gallery-toolbar">
           <div
             className="filters"
             role="group"
-            aria-label="Filter inspiration by style"
+            aria-label="Filtrar la inspiración por estilo"
           >
             {categories.map((item) => (
               <button
@@ -431,8 +445,8 @@ function Gallery() {
             ))}
           </div>
           <p className="gallery-count" role="status">
-            {filtered.length} inspiration{" "}
-            {filtered.length === 1 ? "image" : "images"}
+            {filtered.length} {filtered.length === 1 ? "imagen" : "imágenes"} de
+            inspiración
           </p>
         </div>
         <div className="gallery-grid">
@@ -446,7 +460,7 @@ function Gallery() {
                       categories.find((item) => item.id === photo.category)
                         ?.label
                     }{" "}
-                    INSPIRATION
+                    INSPIRACIÓN
                   </span>
                   <h2>{photo.title}</h2>
                 </div>
@@ -458,10 +472,10 @@ function Gallery() {
         <div className="notice gallery-notice">
           <Sparkle />
           <p>
-            <strong>Inspiration, not a portfolio.</strong> These stock
-            photographs illustrate the visual direction. Category labels are
-            mood-board groupings, not verified treatment techniques. Some images
-            appear in more than one crop.
+            <strong>Inspiración, no un portafolio.</strong> Estas fotografías de
+            stock ilustran la dirección visual. Las etiquetas de categoría son
+            agrupaciones de panel de inspiración, no técnicas de tratamiento
+            verificadas. Algunas imágenes aparecen en más de un recorte.
           </p>
         </div>
       </section>
@@ -474,17 +488,17 @@ function Contact() {
   return (
     <>
       <PageIntro
-        eyebrow="LET’S CONNECT"
+        eyebrow="CONECTEMOS"
         title={
           <>
-            Good things <em>are coming.</em>
+            Buenas cosas <em>están por venir.</em>
           </>
         }
       >
         <p>
-          A new space for little rituals and beautiful details.
+          Un espacio nuevo para pequeños rituales y detalles bonitos.
           <br />
-          Here’s what you need to know about this first look.
+          Esto es lo que debes saber sobre este primer vistazo.
         </p>
       </PageIntro>
       <section className="container contact-layout page-section">
@@ -492,40 +506,43 @@ function Contact() {
           <span className="contact-monogram">g.</span>
           <Sparkle />
           <p>
-            A LITTLE POLISH.
-            <br />A LOT OF POSSIBILITY.
+            UN POCO DE BRILLO.
+            <br />
+            MUCHA POSIBILIDAD.
           </p>
         </div>
         <div className="contact-details">
           <p className="eyebrow">GLAMUROSAS NAILS</p>
           <h2>
-            Let’s make it
+            Hagámoslo
             <br />
-            <em>personal. Soon.</em>
+            <em>personal. Pronto.</em>
           </h2>
           <p>
-            Salon contact details are coming soon. There is no confirmed
-            address, phone number, email, or opening schedule in this preview.
+            Los datos de contacto del salón llegarán pronto. No hay una
+            dirección, teléfono, correo electrónico ni horario de apertura
+            confirmados en esta vista previa.
           </p>
           <dl>
             <div>
-              <dt>Visit the studio</dt>
-              <dd>Location to be announced</dd>
+              <dt>Visita el estudio</dt>
+              <dd>Ubicación por anunciar</dd>
             </div>
             <div>
-              <dt>Get in touch</dt>
-              <dd>Contact channels coming soon</dd>
+              <dt>Ponte en contacto</dt>
+              <dd>Canales de contacto próximamente</dd>
             </div>
             <div>
-              <dt>Plan your moment</dt>
-              <dd>Real booking is not available yet</dd>
+              <dt>Planifica tu momento</dt>
+              <dd>La reserva real aún no está disponible</dd>
             </div>
           </dl>
           <Link className="button" to="/booking">
-            Try the booking experience <Arrow diagonal />
+            Prueba la experiencia de cita <Arrow diagonal />
           </Link>
           <p className="section-note">
-            This is a visual demonstration, not an operating booking service.
+            Esto es una demostración visual, no un servicio de reservas en
+            funcionamiento.
           </p>
         </div>
       </section>
@@ -536,17 +553,17 @@ function Contact() {
 function NotFound() {
   return (
     <section className="not-found container">
-      <p className="eyebrow">404 · A LITTLE DETOUR</p>
+      <p className="eyebrow">404 · UN PEQUEÑO DESVÍO</p>
       <h1>
-        Let’s get you
+        Volvamos
         <br />
-        <em>back to beautiful.</em>
+        <em>a lo hermoso.</em>
       </h1>
       <p>
-        That page doesn’t exist. Your next bit of inspiration is right here.
+        Esa página no existe. Tu próximo toque de inspiración está justo aquí.
       </p>
       <Link className="button" to="/">
-        Back to home <Arrow />
+        Volver al inicio <Arrow />
       </Link>
     </section>
   );
@@ -557,7 +574,7 @@ export function App() {
   return (
     <>
       <a className="skip-link" href="#main-content">
-        Skip to content
+        Saltar al contenido
       </a>
       <RouteEffects />
       <Header />

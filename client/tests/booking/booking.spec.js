@@ -6,11 +6,11 @@ test("service selection carries into the booking demo", async ({ page }) => {
   await booking.blockExternalAssets();
   await booking.goto("/services");
   await page
-    .getByRole("link", { name: "Try booking Acrylic extensions" })
+    .getByRole("link", { name: "Probar la cita para Extensiones acrílicas" })
     .click();
   await expect(booking.service).toHaveValue("acrylic");
   await expect(
-    page.getByRole("heading", { name: "Acrylic extensions", exact: true }),
+    page.getByRole("heading", { name: "Extensiones acrílicas", exact: true }),
   ).toBeVisible();
   await expect(booking.main).toBeFocused();
   await booking.goto("/booking?service=unknown");
@@ -36,13 +36,17 @@ test("empty fields, invalid email, and past dates are rejected accessibly", asyn
   await booking.date.fill("2001-01-01");
   await booking.submit.click();
   await expect(
-    page.getByText("Enter a valid email address.", { exact: true }),
+    page.getByText("Introduce una dirección de correo electrónico válida.", {
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
-    page.getByText("Choose today or a future date.", { exact: true }),
+    page.getByText("Elige hoy o una fecha futura.", { exact: true }),
   ).toBeVisible();
   await expect(booking.email).toBeFocused();
-  await expect(page.getByText("DEMO COMPLETE", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByText("DEMOSTRACIÓN COMPLETADA", { exact: true }),
+  ).toHaveCount(0);
 });
 
 test("valid booking only confirms locally, clears personal details, and sends nothing", async ({
@@ -63,10 +67,10 @@ test("valid booking only confirms locally, clears personal details, and sends no
   });
   await booking.submit.click();
   await expect(page.getByRole("status")).toContainText(
-    "No appointment was saved, sent, or reserved.",
+    "No se guardó, envió ni reservó ninguna cita.",
   );
   await expect(page.getByRole("status")).toContainText(
-    "No calendar event or email was created.",
+    "No se creó ningún evento de calendario ni correo electrónico.",
   );
   expect(submissionRequests).toEqual([]);
   expect(
@@ -75,7 +79,7 @@ test("valid booking only confirms locally, clears personal details, and sends no
       session: sessionStorage.length,
     })),
   ).toEqual({ local: 0, session: 0 });
-  await page.getByRole("button", { name: "Try another demo" }).click();
+  await page.getByRole("button", { name: "Prueba otra demostración" }).click();
   await expect(booking.name).toHaveValue("");
   await expect(booking.email).toHaveValue("");
   await expect(booking.service).toHaveValue("");
@@ -92,5 +96,7 @@ test("minimum date follows the browser local day rather than UTC", async ({
   await booking.fillValid();
   await booking.date.fill("2026-09-06");
   await booking.submit.click();
-  await expect(page.getByRole("status")).toContainText("September 6, 2026");
+  await expect(page.getByRole("status")).toContainText(
+    "6 de septiembre de 2026",
+  );
 });

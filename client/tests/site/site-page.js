@@ -4,9 +4,9 @@ export class SitePage extends BasePage {
   constructor(page) {
     super(page);
     this.navigation = page.getByRole("navigation", {
-      name: "Main navigation",
+      name: "Navegación principal",
       exact: true,
     });
-    this.menu = page.getByRole("button", { name: /navigation menu/ });
+    this.menu = page.getByRole("button", { name: /menú de navegación/ });
   }
 }
