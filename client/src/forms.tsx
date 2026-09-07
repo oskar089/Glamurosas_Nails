@@ -1,101 +1,110 @@
-import { useRef, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useRef, useState } from "react";
+import type { FieldError } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Link, useSearchParams } from "react-router-dom";
-import { Arrow, NailIcon, ReviewCard, Sparkle } from "./components";
+import { PageIntro } from "./components/layout";
+import {
+  Arrow,
+  ErrorSummary,
+  FieldError as FieldErrorMessage,
+  NailIcon,
+  ReviewCard,
+  Sparkle,
+} from "./components/ui";
+import type { BookingConfirmation, Review } from "./models/types";
 import {
   demoTimes,
   exampleReviews,
+  isServiceId,
   localDateString,
   services,
-  validateBooking,
-} from "./content";
+} from "./services/content";
+import { bookingSchema, reviewSchema } from "./services/validators";
 
-function FormIntro({ eyebrow, title, children }) {
-  return (
-    <div className="page-intro container">
-      <p className="eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
-      <div className="page-intro-description">{children}</div>
-    </div>
+interface BookingFormData {
+  name: string;
+  email: string;
+  service: string;
+  date: string;
+  time: string;
+}
+
+interface ReviewFormData {
+  rating: number;
+  comment: string;
+}
+
+const BOOKING_FIELDS = ["name", "email", "service", "date", "time"] as const;
+const REVIEW_FIELDS = ["rating", "comment"] as const;
+
+function toErrorRecord<Name extends string>(
+  names: readonly Name[],
+  errors: Partial<Record<Name, FieldError | undefined>>,
+): Record<Name, string> {
+  return names.reduce(
+    (record, name) => {
+      const message = errors[name]?.message;
+      if (message) {
+        record[name] = message;
+      }
+      return record;
+    },
+    {} as Record<Name, string>,
   );
-}
-
-function FieldError({ id, error }) {
-  return error ? (
-    <span className="field-error" id={`${id}-error`}>
-      {error}
-    </span>
-  ) : null;
-}
-
-function ErrorSummary({ errors }) {
-  return Object.keys(errors).length ? (
-    <div className="error-summary" role="alert">
-      <strong>Hay un detalle que requiere tu atención.</strong>
-      <p>Revisa los campos resaltados a continuación.</p>
-    </div>
-  ) : null;
 }
 
 export function Booking() {
   const [params] = useSearchParams();
   const preselection = params.get("service");
-  const [values, setValues] = useState({
-    name: "",
-    email: "",
-    service: services.some((service) => service.id === preselection)
-      ? preselection
-      : "",
-    date: "",
-    time: "",
-  });
-  const [errors, setErrors] = useState({});
-  const [confirmation, setConfirmation] = useState(null);
-  const formRef = useRef(null);
-  const selectedService = services.find(
-    (service) => service.id === values.service,
-  );
   const today = localDateString();
+  const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(
+    null,
+  );
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    setFocus,
+    formState: { errors },
+  } = useForm<BookingFormData>({
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      service: isServiceId(preselection) ? preselection : "",
+      date: "",
+      time: "",
+    },
+  });
 
-  function update(event) {
-    const { name, value } = event.target;
-    setValues((current) => ({ ...current, [name]: value }));
-    setErrors((current) => ({ ...current, [name]: undefined }));
-  }
+  const selectedService = services.find(
+    (service) => service.id === watch("service"),
+  );
+  const errorRecord = toErrorRecord(BOOKING_FIELDS, errors);
 
-  function submit(event) {
-    event.preventDefault();
-    const nextErrors = validateBooking(values);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) {
-      formRef.current.elements.namedItem(Object.keys(nextErrors)[0])?.focus();
-      return;
-    }
+  const onValidSubmit = (data: BookingFormData) => {
     setConfirmation({
-      service: selectedService.shortName,
-      date: values.date,
-      time: values.time,
+      service: selectedService?.shortName ?? "",
+      date: data.date,
+      time: data.time,
     });
-    setValues({ name: "", email: "", service: "", date: "", time: "" });
-  }
+    reset({ name: "", email: "", service: "", date: "", time: "" });
+  };
 
-  function fieldProps(name) {
-    return {
-      id: name,
-      name,
-      value: values[name],
-      onChange: update,
-      required: true,
-      "aria-invalid": Boolean(errors[name]),
-      "aria-describedby":
-        [errors[name] && `${name}-error`, name === "time" && "time-hint"]
-          .filter(Boolean)
-          .join(" ") || undefined,
-    };
-  }
+  const onInvalidSubmit = () => {
+    const firstInvalid = BOOKING_FIELDS.find((field) => errorRecord[field]);
+    if (firstInvalid) {
+      setFocus(firstInvalid);
+    }
+  };
+
+  const firstError = (field: keyof BookingFormData) => errors[field]?.message;
 
   return (
     <>
-      <FormIntro
+      <PageIntro
         eyebrow="UN MOMENTO PARA TI"
         title={
           <>
@@ -108,14 +117,14 @@ export function Booking() {
           <br />
           Esta es una vista previa de cita, no una solicitud de cita real.
         </p>
-      </FormIntro>
+      </PageIntro>
       <section
         className="container booking-layout page-section"
         aria-label="Demostración de cita"
       >
         <aside className="booking-aside">
           <div className="booking-aside-art">
-            <NailIcon variant={selectedService?.id || "classic"} />
+            <NailIcon variant={selectedService?.id ?? "classic"} />
             <Sparkle />
           </div>
           <p className="eyebrow">TU PEQUEÑO RITUAL</p>
@@ -177,7 +186,11 @@ export function Booking() {
                 <strong>
                   {new Date(`${confirmation.date}T12:00:00`).toLocaleDateString(
                     "es-ES",
-                    { month: "long", day: "numeric", year: "numeric" },
+                    {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    },
                   )}
                 </strong>{" "}
                 a las <strong>{confirmation.time}</strong>.
@@ -189,12 +202,19 @@ export function Booking() {
                   Tu nombre y correo electrónico se eliminaron del formulario.
                 </p>
               </div>
-              <button className="button" onClick={() => setConfirmation(null)}>
+              <button
+                type="button"
+                className="button"
+                onClick={() => setConfirmation(null)}
+              >
                 Prueba otra demostración <Arrow />
               </button>
             </div>
           ) : (
-            <form ref={formRef} noValidate onSubmit={submit}>
+            <form
+              noValidate
+              onSubmit={handleSubmit(onValidSubmit, onInvalidSubmit)}
+            >
               <div className="form-heading">
                 <span className="step-label">01 — TU MOMENTO</span>
                 <span className="demo-tag">Solo demostración</span>
@@ -203,36 +223,52 @@ export function Booking() {
               <p className="form-description">
                 Todos los campos son obligatorios. Usa datos de ejemplo.
               </p>
-              <ErrorSummary
-                errors={Object.fromEntries(
-                  Object.entries(errors).filter(([, error]) => error),
-                )}
-              />
+              <ErrorSummary errors={errorRecord} />
               <div className="field">
                 <label htmlFor="name">Tu nombre</label>
                 <input
-                  {...fieldProps("name")}
+                  id="name"
                   type="text"
                   placeholder="p. ej., Alex Taylor"
                   autoComplete="off"
                   maxLength={100}
+                  {...register("name")}
+                  required
+                  aria-invalid={Boolean(firstError("name"))}
+                  aria-describedby={
+                    firstError("name") ? "name-error" : undefined
+                  }
                 />
-                <FieldError id="name" error={errors.name} />
+                <FieldErrorMessage id="name" error={firstError("name")} />
               </div>
               <div className="field">
                 <label htmlFor="email">Dirección de correo electrónico</label>
                 <input
-                  {...fieldProps("email")}
+                  id="email"
                   type="email"
                   placeholder="alex@example.com"
                   autoComplete="off"
                   maxLength={254}
+                  {...register("email")}
+                  required
+                  aria-invalid={Boolean(firstError("email"))}
+                  aria-describedby={
+                    firstError("email") ? "email-error" : undefined
+                  }
                 />
-                <FieldError id="email" error={errors.email} />
+                <FieldErrorMessage id="email" error={firstError("email")} />
               </div>
               <div className="field">
                 <label htmlFor="service">Elige tu servicio</label>
-                <select {...fieldProps("service")}>
+                <select
+                  id="service"
+                  {...register("service")}
+                  required
+                  aria-invalid={Boolean(firstError("service"))}
+                  aria-describedby={
+                    firstError("service") ? "service-error" : undefined
+                  }
+                >
                   <option value="">Encuentra tu acabado ideal</option>
                   {services.map((service) => (
                     <option key={service.id} value={service.id}>
@@ -241,17 +277,33 @@ export function Booking() {
                     </option>
                   ))}
                 </select>
-                <FieldError id="service" error={errors.service} />
+                <FieldErrorMessage id="service" error={firstError("service")} />
               </div>
               <div className="form-row">
                 <div className="field">
                   <label htmlFor="date">Fecha preferida</label>
-                  <input {...fieldProps("date")} type="date" min={today} />
-                  <FieldError id="date" error={errors.date} />
+                  <input
+                    id="date"
+                    type="date"
+                    min={today}
+                    {...register("date")}
+                    required
+                    aria-invalid={Boolean(firstError("date"))}
+                    aria-describedby={
+                      firstError("date") ? "date-error" : undefined
+                    }
+                  />
+                  <FieldErrorMessage id="date" error={firstError("date")} />
                 </div>
                 <div className="field">
                   <label htmlFor="time">Hora de ejemplo</label>
-                  <select {...fieldProps("time")}>
+                  <select
+                    id="time"
+                    {...register("time")}
+                    required
+                    aria-invalid={Boolean(firstError("time"))}
+                    aria-describedby={`${firstError("time") ? "time-error " : ""}time-hint`}
+                  >
                     <option value="">Elige una hora</option>
                     {demoTimes.map((time) => (
                       <option key={time} value={time}>
@@ -259,7 +311,7 @@ export function Booking() {
                       </option>
                     ))}
                   </select>
-                  <FieldError id="time" error={errors.time} />
+                  <FieldErrorMessage id="time" error={firstError("time")} />
                 </div>
               </div>
               <p className="field-hint" id="time-hint">
@@ -280,46 +332,66 @@ export function Booking() {
   );
 }
 
-export function Reviews({ localReviews, onAddReview }) {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [errors, setErrors] = useState({});
+export function Reviews() {
+  const [localReviews, setLocalReviews] = useState<Review[]>([]);
   const [submitted, setSubmitted] = useState(false);
-  const formRef = useRef(null);
-  function submit(event) {
-    event.preventDefault();
-    const nextErrors = {};
-    if (rating < 1 || rating > 5)
-      nextErrors.rating = "Elige una valoración de 1 a 5 estrellas.";
-    if (comment.trim().length < 10)
-      nextErrors.comment =
-        "Escribe al menos 10 caracteres para tu reseña de demostración.";
-    if (comment.trim().length > 600)
-      nextErrors.comment =
-        "Mantén tu reseña de demostración por debajo de 600 caracteres.";
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) {
-      const target = nextErrors.rating
-        ? formRef.current.querySelector('input[name="rating"]')
-        : formRef.current.elements.namedItem("comment");
-      target?.focus();
-      return;
+  const {
+    watch,
+    setValue,
+    reset,
+    trigger,
+    formState: { errors },
+  } = useForm<ReviewFormData>({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: { rating: 0, comment: "" },
+  });
+
+  const rating = watch("rating");
+  const comment = watch("comment") ?? "";
+  const errorRecord = toErrorRecord(REVIEW_FIELDS, errors);
+  const ratingRef = useRef<HTMLInputElement | null>(null);
+  const commentRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (errors.rating) {
+      ratingRef.current?.focus();
+    } else if (errors.comment) {
+      commentRef.current?.focus();
     }
-    onAddReview({
-      id: crypto.randomUUID(),
-      name: "Tu reseña de demostración",
-      rating,
-      comment: comment.trim(),
-      style: "Visible solo en esta sesión del navegador",
-      example: false,
-    });
-    setRating(0);
-    setComment("");
+  }, [errors.rating, errors.comment]);
+
+  const onValidSubmit = (data: ReviewFormData) => {
+    setLocalReviews((current) => [
+      {
+        id: crypto.randomUUID(),
+        name: "Tu reseña de demostración",
+        rating: data.rating,
+        comment: data.comment.trim(),
+        style: "Visible solo en esta sesión del navegador",
+        example: false,
+      },
+      ...current,
+    ]);
+    reset({ rating: 0, comment: "" });
     setSubmitted(true);
-  }
+  };
+
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const result = reviewSchema.safeParse({
+      rating,
+      comment,
+    });
+    if (result.success) {
+      onValidSubmit(result.data);
+    } else {
+      void trigger();
+    }
+  };
+
   return (
     <>
-      <FormIntro
+      <PageIntro
         eyebrow="PEQUEÑAS PALABRAS, SENSACIONES BONITAS"
         title={
           <>
@@ -333,7 +405,7 @@ export function Reviews({ localReviews, onAddReview }) {
           Explora los ejemplos a continuación o prueba a dejar una reseña de
           demostración.
         </p>
-      </FormIntro>
+      </PageIntro>
       <section className="container page-section">
         <div className="notice">
           <Sparkle />
@@ -347,16 +419,18 @@ export function Reviews({ localReviews, onAddReview }) {
           </p>
         </div>
         <div className="reviews-layout">
-          <div
+          <ul
             className="reviews-list"
             aria-label="Reseñas de ejemplo y demostraciones locales"
           >
             {[...localReviews, ...exampleReviews].map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <li key={review.id}>
+                <ReviewCard review={review} />
+              </li>
             ))}
-          </div>
+          </ul>
           <div className="form-panel review-form-panel">
-            <form noValidate onSubmit={submit} ref={formRef}>
+            <form noValidate onSubmit={onSubmit}>
               <p className="eyebrow">PRUEBA LA EXPERIENCIA</p>
               <h2>Unas palabras bonitas</h2>
               <p className="form-description">
@@ -369,7 +443,7 @@ export function Reviews({ localReviews, onAddReview }) {
                   publica y desaparecerá al recargar.
                 </div>
               )}
-              <ErrorSummary errors={errors} />
+              <ErrorSummary errors={errorRecord} />
               <fieldset
                 className="rating-field"
                 aria-describedby={errors.rating ? "rating-error" : undefined}
@@ -383,8 +457,13 @@ export function Reviews({ localReviews, onAddReview }) {
                         name="rating"
                         value={value}
                         checked={rating === value}
+                        ref={(node) => {
+                          if (node && value === 1) {
+                            ratingRef.current = node;
+                          }
+                        }}
                         onChange={() => {
-                          setRating(value);
+                          setValue("rating", value);
                           setSubmitted(false);
                         }}
                         aria-label={`${value} ${value === 1 ? "estrella" : "estrellas"}`}
@@ -400,16 +479,19 @@ export function Reviews({ localReviews, onAddReview }) {
                     </label>
                   ))}
                 </div>
-                <FieldError id="rating" error={errors.rating} />
+                <FieldErrorMessage
+                  id="rating"
+                  error={errors.rating?.message ?? undefined}
+                />
               </fieldset>
               <div className="field">
                 <label htmlFor="comment">Tus comentarios (obligatorios)</label>
                 <textarea
                   id="comment"
-                  name="comment"
+                  ref={commentRef}
                   value={comment}
                   onChange={(event) => {
-                    setComment(event.target.value);
+                    setValue("comment", event.target.value);
                     setSubmitted(false);
                   }}
                   placeholder="¿Qué haría especial tu experiencia ideal de cuidado de uñas?"
@@ -425,7 +507,11 @@ export function Reviews({ localReviews, onAddReview }) {
                   </span>
                   <span>{comment.length}/600</span>
                 </div>
-                <FieldError id="comment" error={errors.comment} />
+                {errors.comment && (
+                  <span className="field-error" id="comment-error">
+                    {errors.comment.message}
+                  </span>
+                )}
               </div>
               <button className="button button-full" type="submit">
                 Añadir una reseña de demostración <Arrow />

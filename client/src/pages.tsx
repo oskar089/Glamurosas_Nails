@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
+import { Footer, Header, PageIntro, RouteEffects } from "./components/layout";
 import {
   Arrow,
   BookingCallout,
@@ -8,160 +10,17 @@ import {
   SectionHeading,
   ServiceCard,
   Sparkle,
-} from "./components";
-import { categories, exampleReviews, photos, services } from "./content";
+} from "./components/ui";
+import { AppErrorFallback } from "./error-boundary";
 import { Booking, Reviews } from "./forms";
-
-const navigation = [
-  { to: "/", label: "Inicio" },
-  { to: "/services", label: "Servicios" },
-  { to: "/gallery", label: "Galería" },
-  { to: "/reviews", label: "Reseñas" },
-  { to: "/contact", label: "Contacto" },
-];
-
-function Wordmark() {
-  return (
-    <Link
-      to="/"
-      className="wordmark"
-      aria-label="Página de inicio de Glamurosas Nails"
-    >
-      <span>
-        glamurosas<span className="wordmark-dot">.</span>
-      </span>
-      <small>UÑAS Y AUTOCUIDADO</small>
-    </Link>
-  );
-}
-
-function Header() {
-  const [open, setOpen] = useState(false);
-  const toggleRef = useRef(null);
-  const headerRef = useRef(null);
-  const location = useLocation();
-  useEffect(() => setOpen(false), [location]);
-  useEffect(() => {
-    if (!open) return;
-    function dismiss(event) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        toggleRef.current?.focus();
-      }
-    }
-    document.addEventListener("keydown", dismiss);
-    return () => document.removeEventListener("keydown", dismiss);
-  }, [open]);
-  return (
-    <>
-      <div className="demo-banner">
-        Una pequeña vista previa de algo hermoso.{" "}
-        <span>Sitio web de demostración · las reservas no están activas</span>
-        <Sparkle />
-      </div>
-      <header
-        className="site-header"
-        ref={headerRef}
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget))
-            setOpen(false);
-        }}
-      >
-        <div className="header-inner">
-          <Wordmark />
-          <button
-            ref={toggleRef}
-            className="menu-toggle"
-            aria-expanded={open}
-            aria-controls="main-navigation"
-            aria-label={
-              open ? "Cerrar menú de navegación" : "Abrir menú de navegación"
-            }
-            onClick={() => setOpen(!open)}
-          >
-            <span
-              className={open ? "menu-lines is-open" : "menu-lines"}
-              aria-hidden="true"
-            />
-            <span>Menú</span>
-          </button>
-          <nav
-            id="main-navigation"
-            aria-label="Navegación principal"
-            className={`main-navigation ${open ? "is-open" : ""}`}
-          >
-            {navigation.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.to === "/"}>
-                {item.label}
-              </NavLink>
-            ))}
-            <Link className="button button-small" to="/booking">
-              Reserva tu momento <Arrow diagonal />
-            </Link>
-          </nav>
-        </div>
-      </header>
-    </>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="site-footer">
-      <div className="footer-top">
-        <div>
-          <Wordmark />
-          <p>
-            Un poco de brillo. Mucha posibilidad.
-            <br />
-            Tu historia de autocuidado empieza aquí.
-          </p>
-        </div>
-        <div>
-          <h2>Encuentra tu inspiración</h2>
-          <nav aria-label="Navegación del pie de página">
-            <Link to="/services">El menú de servicios</Link>
-            <Link to="/gallery">La edición de inspiración</Link>
-            <Link to="/booking">Prueba la demostración de cita</Link>
-          </nav>
-        </div>
-        <div>
-          <h2>Mantengámonos en contacto</h2>
-          <p>Los datos de contacto del salón llegarán pronto.</p>
-          <Link className="text-link" to="/contact">
-            Acerca de esta vista previa <Arrow diagonal />
-          </Link>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} Glamurosas Nails · Concepto visual</p>
-        <p>Imágenes de inspiración de stock. Precios y reseñas de ejemplo.</p>
-        <span>
-          HECHO PARA TU MOMENTO <Sparkle />
-        </span>
-      </div>
-    </footer>
-  );
-}
-
-function RouteEffects() {
-  const { pathname } = useLocation();
-  const previousPath = useRef(pathname);
-  useEffect(() => {
-    const name =
-      navigation.find((item) => item.to === pathname)?.label ||
-      (pathname === "/booking"
-        ? "Demostración de cita"
-        : "Página no encontrada");
-    document.title = `${name} | Glamurosas Nails`;
-    if (previousPath.current !== pathname) {
-      window.scrollTo({ top: 0, behavior: "instant" });
-      document.getElementById("main-content")?.focus({ preventScroll: true });
-      previousPath.current = pathname;
-    }
-  }, [pathname]);
-  return null;
-}
+import type { CategoryId } from "./models/types";
+import {
+  categories,
+  exampleReviews,
+  isCategoryId,
+  photos,
+  services,
+} from "./services/content";
 
 function Home() {
   return (
@@ -330,16 +189,6 @@ function Home() {
   );
 }
 
-export function PageIntro({ eyebrow, title, children }) {
-  return (
-    <div className="page-intro container">
-      <p className="eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
-      <div className="page-intro-description">{children}</div>
-    </div>
-  );
-}
-
 function Services() {
   return (
     <>
@@ -400,8 +249,8 @@ function Services() {
 function Gallery() {
   const { search } = useLocation();
   const initial = new URLSearchParams(search).get("category");
-  const [category, setCategory] = useState(
-    categories.some((item) => item.id === initial) ? initial : "all",
+  const [category, setCategory] = useState<CategoryId>(
+    isCategoryId(initial) ? initial : "all",
   );
   const filtered =
     category === "all"
@@ -428,6 +277,11 @@ function Gallery() {
         aria-label="Galería de inspiración de uñas"
       >
         <div className="gallery-toolbar">
+          {/*
+            biome-ignore lint/a11y/useSemanticElements: el e2e exige
+            getByRole("group", { name: "Filtrar la inspiración por estilo" }) para los
+            filtros; reemplazarlo por fieldset rompería el contrato de los tests.
+          */}
           <div
             className="filters"
             role="group"
@@ -570,7 +424,7 @@ function NotFound() {
 }
 
 export function App() {
-  const [localReviews, setLocalReviews] = useState([]);
+  const location = useLocation();
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -579,25 +433,20 @@ export function App() {
       <RouteEffects />
       <Header />
       <main id="main-content" tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route
-            path="/reviews"
-            element={
-              <Reviews
-                localReviews={localReviews}
-                onAddReview={(review) =>
-                  setLocalReviews((current) => [review, ...current])
-                }
-              />
-            }
-          />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary
+          resetKeys={[location.pathname]}
+          FallbackComponent={AppErrorFallback}
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
       <Footer />
     </>

@@ -1,7 +1,18 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import type {
+  Photo as PhotoModel,
+  Review,
+  Service,
+  ServiceId,
+} from "../models/types";
 
-export function Arrow({ diagonal = false }) {
+interface ArrowProps {
+  diagonal?: boolean;
+}
+
+export function Arrow({ diagonal = false }: ArrowProps) {
   return (
     <svg
       width="20"
@@ -21,7 +32,11 @@ export function Arrow({ diagonal = false }) {
   );
 }
 
-export function Sparkle({ className = "" }) {
+interface SparkleProps {
+  className?: string;
+}
+
+export function Sparkle({ className = "" }: SparkleProps) {
   return (
     <svg
       className={className}
@@ -40,7 +55,11 @@ export function Sparkle({ className = "" }) {
   );
 }
 
-export function NailIcon({ variant = "classic" }) {
+interface NailIconProps {
+  variant?: ServiceId;
+}
+
+export function NailIcon({ variant = "classic" }: NailIconProps) {
   return (
     <svg
       width="48"
@@ -76,7 +95,13 @@ export function NailIcon({ variant = "classic" }) {
   );
 }
 
-export function Photo({ photo, hero = false, className = "" }) {
+interface PhotoProps {
+  photo: PhotoModel;
+  hero?: boolean;
+  className?: string;
+}
+
+export function Photo({ photo, hero = false, className = "" }: PhotoProps) {
   const [failed, setFailed] = useState(false);
   const width = hero ? 1400 : 800;
   return (
@@ -109,13 +134,21 @@ export function Photo({ photo, hero = false, className = "" }) {
   );
 }
 
+interface SectionHeadingProps {
+  eyebrow: string;
+  title: ReactNode;
+  description?: string;
+  children?: ReactNode;
+  centered?: boolean;
+}
+
 export function SectionHeading({
   eyebrow,
   title,
   description,
   children,
   centered = false,
-}) {
+}: SectionHeadingProps) {
   return (
     <div className={`section-heading ${centered ? "centered" : ""}`}>
       <div>
@@ -128,7 +161,12 @@ export function SectionHeading({
   );
 }
 
-export function ServiceCard({ service, index }) {
+interface ServiceCardProps {
+  service: Service;
+  index: number;
+}
+
+export function ServiceCard({ service, index }: ServiceCardProps) {
   return (
     <article className="service-card">
       <div className="service-card-top">
@@ -158,7 +196,11 @@ export function ServiceCard({ service, index }) {
   );
 }
 
-export function ReviewCard({ review }) {
+interface ReviewCardProps {
+  review: Review;
+}
+
+export function ReviewCard({ review }: ReviewCardProps) {
   return (
     <article className="review-card">
       <div className="review-card-top">
@@ -205,4 +247,30 @@ export function BookingCallout() {
       <small>Una vista previa visual. No se crean citas reales.</small>
     </section>
   );
+}
+
+interface FieldErrorProps {
+  id: string;
+  error?: string;
+}
+
+export function FieldError({ id, error }: FieldErrorProps) {
+  return error ? (
+    <span className="field-error" id={`${id}-error`}>
+      {error}
+    </span>
+  ) : null;
+}
+
+interface ErrorSummaryProps {
+  errors: Record<string, string>;
+}
+
+export function ErrorSummary({ errors }: ErrorSummaryProps) {
+  return Object.keys(errors).length ? (
+    <div className="error-summary" role="alert">
+      <strong>Hay un detalle que requiere tu atención.</strong>
+      <p>Revisa los campos resaltados a continuación.</p>
+    </div>
+  ) : null;
 }

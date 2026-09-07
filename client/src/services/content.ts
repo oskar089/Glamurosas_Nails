@@ -1,4 +1,14 @@
-export const services = [
+import type {
+  Category,
+  CategoryId,
+  Photo,
+  Review,
+  Service,
+  ServiceId,
+} from "../models/types";
+import { CATEGORY_IDS, SERVICE_IDS } from "../models/types";
+
+export const services: Service[] = [
   {
     id: "classic",
     name: "La manicura clásica",
@@ -41,7 +51,7 @@ export const services = [
   },
 ];
 
-export const photos = [
+export const photos: Photo[] = [
   {
     id: "soft-statement",
     image: "photo-1604654894610-df63bc536371",
@@ -92,7 +102,7 @@ export const photos = [
   },
 ];
 
-export const categories = [
+export const categories: Category[] = [
   { id: "all", label: "Toda la inspiración" },
   { id: "acrylic", label: "Acrílico" },
   { id: "gel", label: "Gel" },
@@ -100,7 +110,7 @@ export const categories = [
   { id: "classic", label: "Clásica" },
 ];
 
-export const exampleReviews = [
+export const exampleReviews: Review[] = [
   {
     id: "example-1",
     name: "Una pausa cotidiana",
@@ -130,31 +140,24 @@ export const exampleReviews = [
   },
 ];
 
-export function localDateString(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+export const demoTimes = [
+  "09:00",
+  "10:30",
+  "12:00",
+  "14:00",
+  "15:30",
+  "17:00",
+] as const;
+export type DemoTime = (typeof demoTimes)[number];
+
+export function isServiceId(value: string | null): value is ServiceId {
+  return SERVICE_IDS.includes(value as ServiceId);
 }
 
-export const demoTimes = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
+export function isCategoryId(value: string | null): value is CategoryId {
+  return CATEGORY_IDS.includes(value as CategoryId);
+}
 
-export function validateBooking(values, today = localDateString()) {
-  const errors = {};
-  if (values.name.trim().length < 2)
-    errors.name = "Introduce un nombre de al menos 2 caracteres.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
-    errors.email = "Introduce una dirección de correo electrónico válida.";
-  if (!services.some((service) => service.id === values.service))
-    errors.service = "Elige un servicio.";
-  const parsedDate = new Date(`${values.date}T12:00:00`);
-  if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(values.date) ||
-    Number.isNaN(parsedDate.getTime()) ||
-    localDateString(parsedDate) !== values.date
-  ) {
-    errors.date = "Elige una fecha válida.";
-  } else if (values.date < today) {
-    errors.date = "Elige hoy o una fecha futura.";
-  }
-  if (!demoTimes.includes(values.time))
-    errors.time = "Elige una hora de ejemplo.";
-  return errors;
+export function localDateString(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
