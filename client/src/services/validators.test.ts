@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import {
+  bookingRequestSchema,
   bookingSchema,
   createBookingSchema,
-  reviewSchema,
-  validateBooking,
-} from "./validators";
+} from "@glamurosas/shared";
+import { describe, expect, it } from "vitest";
+import { reviewSchema, validateBooking } from "./validators";
 
 const TODAY = "2026-09-07";
 
@@ -99,6 +99,36 @@ describe("bookingSchema (exported default)", () => {
       date: "2099-12-31",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("bookingRequestSchema", () => {
+  it("accepts the browser-local current date without using the server clock", () => {
+    const result = bookingRequestSchema.safeParse({
+      ...VALID_BOOKING,
+      date: "2026-09-06",
+      clientToday: "2026-09-06",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an invalid client-local date with the exact Spanish message", () => {
+    const result = bookingRequestSchema.safeParse({
+      ...VALID_BOOKING,
+      clientToday: "2026-02-30",
+    });
+    expect(result.success).toBe(false);
+    expect(issueMessages(result)).toContain("Elige una fecha válida.");
+  });
+
+  it("rejects a requested date before the browser-local current date", () => {
+    const result = bookingRequestSchema.safeParse({
+      ...VALID_BOOKING,
+      date: "2026-09-06",
+      clientToday: TODAY,
+    });
+    expect(result.success).toBe(false);
+    expect(issueMessages(result)).toContain("Elige hoy o una fecha futura.");
   });
 });
 

@@ -1,3 +1,10 @@
+import {
+  type BookingInput,
+  type BookingRequest,
+  bookingSchema,
+  type DemoTime,
+  type ServiceId,
+} from "@glamurosas/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import type { FieldError } from "react-hook-form";
@@ -13,6 +20,7 @@ import {
   Sparkle,
 } from "./components/ui";
 import type { BookingConfirmation, Review } from "./models/types";
+import { createBooking } from "./services/api";
 import {
   demoTimes,
   exampleReviews,
@@ -20,7 +28,7 @@ import {
   localDateString,
   services,
 } from "./services/content";
-import { bookingSchema, reviewSchema } from "./services/validators";
+import { reviewSchema } from "./services/validators";
 
 interface BookingFormData {
   name: string;
@@ -61,6 +69,8 @@ export function Booking() {
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(
     null,
   );
+  const [isSending, setIsSending] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -84,13 +94,37 @@ export function Booking() {
   );
   const errorRecord = toErrorRecord(BOOKING_FIELDS, errors);
 
-  const onValidSubmit = (data: BookingFormData) => {
-    setConfirmation({
-      service: selectedService?.shortName ?? "",
+  const onValidSubmit = async (data: BookingFormData) => {
+    setIsSending(true);
+    setServerError(null);
+    const input: BookingInput = {
+      name: data.name,
+      email: data.email,
+      service: data.service as ServiceId,
       date: data.date,
-      time: data.time,
-    });
-    reset({ name: "", email: "", service: "", date: "", time: "" });
+      time: data.time as DemoTime,
+    };
+    try {
+      const request: BookingRequest = {
+        ...input,
+        clientToday: localDateString(new Date()),
+      };
+      await createBooking(request);
+      setConfirmation({
+        service: selectedService?.shortName ?? "",
+        date: data.date,
+        time: data.time,
+      });
+      reset({ name: "", email: "", service: "", date: "", time: "" });
+    } catch (error) {
+      setServerError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo enviar la reserva. Inténtalo de nuevo más tarde.",
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const onInvalidSubmit = () => {
@@ -113,14 +147,14 @@ export function Booking() {
         }
       >
         <p>
-          Prueba el recorrido desde la inspiración hasta tu próximo estilo.
+          Elige el servicio, la fecha y la hora que prefieras para tu solicitud.
           <br />
-          Esta es una vista previa de cita, no una solicitud de cita real.
+          Confirmaremos la disponibilidad antes de confirmar tu cita.
         </p>
       </PageIntro>
       <section
         className="container booking-layout page-section"
-        aria-label="Demostración de cita"
+        aria-label="Solicitud de cita"
       >
         <aside className="booking-aside">
           <div className="booking-aside-art">
@@ -142,25 +176,24 @@ export function Booking() {
           <p>
             {selectedService
               ? selectedService.description
-              : "Elige un servicio para explorar tu propio momento de cuidado, personalidad y posibilidades."}
+              : "Elige un servicio para preparar tu solicitud de cita según tu estilo y preferencias."}
           </p>
           {selectedService && (
             <div className="booking-estimate">
               <strong>Desde ${selectedService.price} USD</strong>
               <span>
-                {selectedService.duration} min · precio ilustrativo en USD
+                {selectedService.duration} min · precio de referencia en USD
               </span>
             </div>
           )}
           <div className="privacy-note">
             <Sparkle />
             <div>
-              <h3>Solo una vista previa. Siempre privada.</h3>
+              <h3>Tu solicitud queda registrada.</h3>
               <p>
-                No se guarda ni se envía ninguna cita. No se crea ningún evento
-                de calendario ni correo electrónico. Los datos del formulario
-                permanecen en la memoria de esta página y se eliminan tras un
-                envío válido o al salir.
+                Usamos tus datos para registrar tu solicitud de cita. La
+                disponibilidad de la fecha y hora queda pendiente de
+                confirmación.
               </p>
             </div>
           </div>
@@ -174,14 +207,14 @@ export function Booking() {
               <span className="confirmation-icon" aria-hidden="true">
                 ✓
               </span>
-              <p className="eyebrow">DEMOSTRACIÓN COMPLETADA</p>
+              <p className="eyebrow">SOLICITUD RECIBIDA</p>
               <h2>
                 Una elección encantadora.
                 <br />
-                <em>Solo una vista previa.</em>
+                <em>Confirmaremos la disponibilidad.</em>
               </h2>
               <p>
-                Probaste la experiencia de cita para{" "}
+                Recibimos tu solicitud de cita para{" "}
                 <strong>{confirmation.service}</strong> el{" "}
                 <strong>
                   {new Date(`${confirmation.date}T12:00:00`).toLocaleDateString(
@@ -197,9 +230,9 @@ export function Booking() {
               </p>
               <div className="notice">
                 <p>
-                  <strong>No se guardó, envió ni reservó ninguna cita.</strong>{" "}
-                  No se creó ningún evento de calendario ni correo electrónico.
-                  Tu nombre y correo electrónico se eliminaron del formulario.
+                  <strong>Tu solicitud se guardó correctamente.</strong> La
+                  disponibilidad de la fecha y hora queda pendiente de
+                  confirmación.
                 </p>
               </div>
               <button
@@ -207,7 +240,7 @@ export function Booking() {
                 className="button"
                 onClick={() => setConfirmation(null)}
               >
-                Prueba otra demostración <Arrow />
+                Enviar otra solicitud <Arrow />
               </button>
             </div>
           ) : (
@@ -215,13 +248,19 @@ export function Booking() {
               noValidate
               onSubmit={handleSubmit(onValidSubmit, onInvalidSubmit)}
             >
+              {serverError && (
+                <div className="error-summary" role="alert">
+                  <p>{serverError}</p>
+                </div>
+              )}
               <div className="form-heading">
                 <span className="step-label">01 — TU MOMENTO</span>
-                <span className="demo-tag">Solo demostración</span>
+                <span className="demo-tag">Solicitud pendiente</span>
               </div>
               <h2>Los pequeños detalles</h2>
               <p className="form-description">
-                Todos los campos son obligatorios. Usa datos de ejemplo.
+                Todos los campos son obligatorios. Completa tus datos para
+                enviar la solicitud.
               </p>
               <ErrorSummary errors={errorRecord} />
               <div className="field">
@@ -296,7 +335,7 @@ export function Booking() {
                   <FieldErrorMessage id="date" error={firstError("date")} />
                 </div>
                 <div className="field">
-                  <label htmlFor="time">Hora de ejemplo</label>
+                  <label htmlFor="time">Hora preferida</label>
                   <select
                     id="time"
                     {...register("time")}
@@ -315,14 +354,25 @@ export function Booking() {
                 </div>
               </div>
               <p className="field-hint" id="time-hint">
-                Las horas son ejemplos, no horarios del salón ni disponibilidad
-                real.
+                La disponibilidad de la hora solicitada se confirmará antes de
+                reservar tu cita.
               </p>
-              <button type="submit" className="button button-full">
-                Ver mi cita de ejemplo <Arrow diagonal />
+              <button
+                type="submit"
+                className="button button-full"
+                disabled={isSending}
+              >
+                {isSending ? (
+                  "Enviando solicitud…"
+                ) : (
+                  <>
+                    Enviar solicitud de cita <Arrow diagonal />
+                  </>
+                )}
               </button>
               <p className="submit-note">
-                Esto no reserva, envía ni guarda ninguna cita.
+                La solicitud se registra al enviarla. La disponibilidad se
+                confirmará antes de reservar tu cita.
               </p>
             </form>
           )}

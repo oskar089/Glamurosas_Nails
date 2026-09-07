@@ -1,45 +1,6 @@
 import { z } from "zod";
 import type { BookingFormValues } from "../models/types";
-import type { DemoTime } from "./content";
-import { demoTimes, isServiceId, localDateString, services } from "./content";
-
-export function createBookingSchema(today = localDateString()) {
-  return z.object({
-    name: z
-      .string()
-      .trim()
-      .min(2, { error: "Introduce un nombre de al menos 2 caracteres." }),
-    email: z.email({
-      error: "Introduce una dirección de correo electrónico válida.",
-    }),
-    service: z.string().refine(isServiceId, {
-      message: "Elige un servicio.",
-    }),
-    date: z.string().superRefine((value, context) => {
-      const parsedDate = new Date(`${value}T12:00:00`);
-      if (
-        !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
-        Number.isNaN(parsedDate.getTime()) ||
-        localDateString(parsedDate) !== value
-      ) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Elige una fecha válida.",
-        });
-      } else if (value < today) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Elige hoy o una fecha futura.",
-        });
-      }
-    }),
-    time: z.string().refine((value) => demoTimes.includes(value as DemoTime), {
-      message: "Elige una hora de ejemplo.",
-    }),
-  });
-}
-
-export const bookingSchema = createBookingSchema();
+import { demoTimes, localDateString, services } from "./content";
 
 export const reviewSchema = z.object({
   rating: z.number().superRefine((value, context) => {

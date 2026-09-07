@@ -242,9 +242,12 @@ export function BookingCallout() {
       </h2>
       <p>Encuentra tu inspiración. Reserva un pequeño espacio para ti.</p>
       <Link className="button button-light" to="/booking">
-        Explora la demostración de cita <Arrow />
+        Solicita una cita <Arrow />
       </Link>
-      <small>Una vista previa visual. No se crean citas reales.</small>
+      <small>
+        La solicitud se registra y queda pendiente de confirmación de
+        disponibilidad.
+      </small>
     </section>
   );
 }

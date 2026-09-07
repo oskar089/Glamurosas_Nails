@@ -47,7 +47,7 @@ export function Header() {
     <>
       <div className="demo-banner">
         Una pequeña vista previa de algo hermoso.{" "}
-        <span>Sitio web de demostración · las reservas no están activas</span>
+        <span>Sitio web en vista previa · solicitudes de cita disponibles</span>
         <Sparkle />
       </div>
       {/*
@@ -93,7 +93,7 @@ export function Header() {
                 </NavLink>
               ))}
               <Link className="button button-small" to="/booking">
-                Reserva tu momento <Arrow diagonal />
+                Solicita tu cita <Arrow diagonal />
               </Link>
             </nav>
           </div>
@@ -120,7 +120,7 @@ export function Footer() {
           <nav aria-label="Navegación del pie de página">
             <Link to="/services">El menú de servicios</Link>
             <Link to="/gallery">La edición de inspiración</Link>
-            <Link to="/booking">Prueba la demostración de cita</Link>
+            <Link to="/booking">Solicita una cita</Link>
           </nav>
         </div>
         <div>

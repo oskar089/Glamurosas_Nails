@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Booking, Reviews } from "./forms";
 import { localDateString } from "./services/content";
 
@@ -37,10 +37,23 @@ async function fillValidBooking(user: ReturnType<typeof userEvent.setup>) {
   fireEvent.change(screen.getByLabelText("Fecha preferida"), {
     target: { value: localDate(1) },
   });
-  await user.selectOptions(screen.getByLabelText("Hora de ejemplo"), "10:30");
+  await user.selectOptions(screen.getByLabelText("Hora preferida"), "10:30");
+}
+
+function mockFetchOk(): ReturnType<typeof vi.fn> {
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    status: 201,
+    json: async () => ({ id: 42 }),
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
 }
 
 describe("Booking", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
   it("pre-selects a valid service from the query string", () => {
     renderBooking("/booking?service=acrylic");
     expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("acrylic");
@@ -67,7 +80,7 @@ describe("Booking", () => {
     renderBooking();
 
     await user.click(
-      screen.getByRole("button", { name: "Ver mi cita de ejemplo" }),
+      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
     );
 
     const alert = screen.getByRole("alert");
@@ -109,7 +122,7 @@ describe("Booking", () => {
       target: { value: localDate(-1) },
     });
     await user.click(
-      screen.getByRole("button", { name: "Ver mi cita de ejemplo" }),
+      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
     );
 
     expect(
@@ -124,26 +137,40 @@ describe("Booking", () => {
       screen.getByText("Elige hoy o una fecha futura.", { exact: true }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("DEMOSTRACIÓN COMPLETADA", { exact: true }),
+      screen.queryByText("SOLICITUD RECIBIDA", { exact: true }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByLabelText("Dirección de correo electrónico"),
     ).toHaveFocus();
   });
 
-  it("confirms locally with exact Spanish copy and resets the form", async () => {
+  it("sends the booking request to the API, confirms it, and resets the form", async () => {
     const user = userEvent.setup();
+    const fetchMock = mockFetchOk();
     renderBooking();
     await fillValidBooking(user);
 
     await user.click(
-      screen.getByRole("button", { name: "Ver mi cita de ejemplo" }),
+      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
     );
 
-    const status = screen.getByRole("status");
-    expect(status).toHaveTextContent("DEMOSTRACIÓN COMPLETADA");
+    expect(fetchMock).toHaveBeenCalledWith("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Alex Example",
+        email: "alex@example.com",
+        service: "gel",
+        date: localDate(1),
+        time: "10:30",
+        clientToday: localDateString(new Date()),
+      }),
+    });
+
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent("SOLICITUD RECIBIDA");
     expect(status).toHaveTextContent("Una elección encantadora.");
-    expect(status).toHaveTextContent("Solo una vista previa.");
+    expect(status).toHaveTextContent("Confirmaremos la disponibilidad.");
     const expectedDate = new Date(
       `${localDate(1)}T12:00:00`,
     ).toLocaleDateString("es-ES", {
@@ -152,20 +179,15 @@ describe("Booking", () => {
       year: "numeric",
     });
     expect(status).toHaveTextContent(
-      `Probaste la experiencia de cita para Manicura de gel el ${expectedDate} a las 10:30`,
+      `Recibimos tu solicitud de cita para Manicura de gel el ${expectedDate} a las 10:30`,
     );
+    expect(status).toHaveTextContent("Tu solicitud se guardó correctamente.");
     expect(status).toHaveTextContent(
-      "No se guardó, envió ni reservó ninguna cita.",
-    );
-    expect(status).toHaveTextContent(
-      "No se creó ningún evento de calendario ni correo electrónico.",
-    );
-    expect(status).toHaveTextContent(
-      "Tu nombre y correo electrónico se eliminaron del formulario.",
+      "La disponibilidad de la fecha y hora queda pendiente de confirmación.",
     );
 
     await user.click(
-      screen.getByRole("button", { name: "Prueba otra demostración" }),
+      screen.getByRole("button", { name: "Enviar otra solicitud" }),
     );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Tu nombre")).toHaveValue("");
@@ -173,6 +195,65 @@ describe("Booking", () => {
       screen.getByLabelText("Dirección de correo electrónico"),
     ).toHaveValue("");
     expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("");
+  });
+
+  it("shows the server error accessibly and keeps the form values", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: "Elige un servicio." }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    renderBooking();
+    await fillValidBooking(user);
+
+    await user.click(
+      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Elige un servicio.");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Tu nombre")).toHaveValue("Alex Example");
+    expect(
+      screen.getByLabelText("Dirección de correo electrónico"),
+    ).toHaveValue("alex@example.com");
+    expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("gel");
+  });
+
+  it("disables the submit button and announces the pending state while sending", async () => {
+    let resolveFetch: (value: {
+      ok: boolean;
+      status: number;
+      json: () => Promise<{ id: number }>;
+    }) => void = () => {};
+    const pendingFetch = new Promise<{
+      ok: boolean;
+      status: number;
+      json: () => Promise<{ id: number }>;
+    }>((resolve) => {
+      resolveFetch = resolve;
+    });
+    const fetchMock = vi.fn().mockReturnValue(pendingFetch);
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    renderBooking();
+    await fillValidBooking(user);
+
+    await user.click(
+      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
+    );
+
+    const sending = await screen.findByRole("button", {
+      name: "Enviando solicitud…",
+    });
+    expect(sending).toBeDisabled();
+
+    resolveFetch({ ok: true, status: 201, json: async () => ({ id: 1 }) });
+    await screen.findByRole("status");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

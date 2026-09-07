@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { BookingPage } from "./booking-page";
 
-test("service selection carries into the booking demo", async ({ page }) => {
+test("service selection carries into the booking request", async ({ page }) => {
   const booking = new BookingPage(page);
   await booking.blockExternalAssets();
   await booking.goto("/services");
@@ -45,41 +45,57 @@ test("empty fields, invalid email, and past dates are rejected accessibly", asyn
   ).toBeVisible();
   await expect(booking.email).toBeFocused();
   await expect(
-    page.getByText("DEMOSTRACIÓN COMPLETADA", { exact: true }),
+    page.getByText("SOLICITUD RECIBIDA", { exact: true }),
   ).toHaveCount(0);
 });
 
-test("valid booking only confirms locally, clears personal details, and sends nothing", async ({
+test("valid booking posts to the API, confirms the request, and clears personal details", async ({
   page,
 }) => {
   const booking = new BookingPage(page);
   await booking.blockExternalAssets();
   await booking.goto("/booking");
   await booking.fillValid();
-  const submissionRequests = [];
-  await page.route("**/*", (route) => {
-    submissionRequests.push({
-      url: route.request().url(),
-      method: route.request().method(),
-      body: route.request().postData(),
-    });
-    return route.abort();
+  const tomorrow = await page.evaluate(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   });
+  const clientToday = await page.evaluate(() => {
+    const date = new Date();
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  });
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().endsWith("/api/bookings") &&
+      response.status() === 201,
+  );
   await booking.submit.click();
+  const response = await responsePromise;
+  expect(response.request().postDataJSON()).toEqual({
+    name: "Alex Example",
+    email: "alex@example.com",
+    service: "gel",
+    date: tomorrow,
+    time: "10:30",
+    clientToday,
+  });
+  const created = await response.json();
+  expect(created.id).toEqual(expect.any(Number));
   await expect(page.getByRole("status")).toContainText(
-    "No se guardó, envió ni reservó ninguna cita.",
+    "Tu solicitud se guardó correctamente.",
   );
   await expect(page.getByRole("status")).toContainText(
-    "No se creó ningún evento de calendario ni correo electrónico.",
+    "La disponibilidad de la fecha y hora queda pendiente de confirmación.",
   );
-  expect(submissionRequests).toEqual([]);
   expect(
     await page.evaluate(() => ({
       local: localStorage.length,
       session: sessionStorage.length,
     })),
   ).toEqual({ local: 0, session: 0 });
-  await page.getByRole("button", { name: "Prueba otra demostración" }).click();
+  await page.getByRole("button", { name: "Enviar otra solicitud" }).click();
   await expect(booking.name).toHaveValue("");
   await expect(booking.email).toHaveValue("");
   await expect(booking.service).toHaveValue("");
@@ -95,7 +111,22 @@ test("minimum date follows the browser local day rather than UTC", async ({
   await expect(booking.date).toHaveAttribute("min", "2026-09-06");
   await booking.fillValid();
   await booking.date.fill("2026-09-06");
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().endsWith("/api/bookings") &&
+      response.status() === 201,
+  );
   await booking.submit.click();
+  const response = await responsePromise;
+  expect(response.request().postDataJSON()).toEqual({
+    name: "Alex Example",
+    email: "alex@example.com",
+    service: "gel",
+    date: "2026-09-06",
+    time: "10:30",
+    clientToday: "2026-09-06",
+  });
   await expect(page.getByRole("status")).toContainText(
     "6 de septiembre de 2026",
   );

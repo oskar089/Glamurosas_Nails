@@ -2,7 +2,14 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import type { Photo as PhotoModel, Review, Service } from "../models/types";
-import { ErrorSummary, FieldError, Photo, ReviewCard, ServiceCard } from "./ui";
+import {
+  BookingCallout,
+  ErrorSummary,
+  FieldError,
+  Photo,
+  ReviewCard,
+  ServiceCard,
+} from "./ui";
 
 const service: Service = {
   id: "gel",
@@ -130,6 +137,23 @@ describe("ReviewCard", () => {
     expect(
       screen.getByRole("img", { name: "4 de 5 estrellas" }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("BookingCallout", () => {
+  it("describes a registered request pending availability confirmation", () => {
+    render(
+      <MemoryRouter>
+        <BookingCallout />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Solicita una cita" }),
+    ).toHaveAttribute("href", "/booking");
+    expect(screen.getByText(/La solicitud se registra/)).toHaveTextContent(
+      "La solicitud se registra y queda pendiente de confirmación de disponibilidad.",
+    );
   });
 });
 

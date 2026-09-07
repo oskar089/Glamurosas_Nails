@@ -232,9 +232,10 @@ function Services() {
             <em>Un bello comienzo.</em>
           </h2>
           <p>
-            Usa la galería para explorar formas, colores y detalles. La
-            demostración de cita te permite probar a elegir un servicio, una
-            fecha y una hora sin hacer una cita real.
+            Usa la galería para explorar formas, colores y detalles. Puedes
+            solicitar una cita eligiendo un servicio, una fecha y una hora. La
+            solicitud se registra y queda pendiente de confirmación de
+            disponibilidad.
           </p>
           <Link className="text-link" to="/gallery">
             Construye tu inspiración <Arrow />
@@ -388,15 +389,17 @@ function Contact() {
             </div>
             <div>
               <dt>Planifica tu momento</dt>
-              <dd>La reserva real aún no está disponible</dd>
+              <dd>
+                Solicitudes de cita disponibles, pendientes de confirmación
+              </dd>
             </div>
           </dl>
           <Link className="button" to="/booking">
-            Prueba la experiencia de cita <Arrow diagonal />
+            Solicita tu cita <Arrow diagonal />
           </Link>
           <p className="section-note">
-            Esto es una demostración visual, no un servicio de reservas en
-            funcionamiento.
+            Las solicitudes de cita se registran y quedan pendientes de
+            confirmación de disponibilidad.
           </p>
         </div>
       </section>

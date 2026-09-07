@@ -9,8 +9,10 @@ export class BookingPage extends BasePage {
     });
     this.service = page.getByLabel("Elige tu servicio", { exact: true });
     this.date = page.getByLabel("Fecha preferida", { exact: true });
-    this.time = page.getByLabel("Hora de ejemplo", { exact: true });
-    this.submit = page.getByRole("button", { name: "Ver mi cita de ejemplo" });
+    this.time = page.getByLabel("Hora preferida", { exact: true });
+    this.submit = page.getByRole("button", {
+      name: "Enviar solicitud de cita",
+    });
   }
 
   async fillValid() {

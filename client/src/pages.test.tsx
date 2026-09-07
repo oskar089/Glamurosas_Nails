@@ -88,3 +88,31 @@ describe("Header navigation", () => {
     expect(toggle).toHaveFocus();
   });
 });
+
+describe("Booking request copy", () => {
+  it("describes service-page requests as pending availability confirmation", () => {
+    renderApp("/services");
+
+    expect(screen.getByText(/Puedes solicitar una cita/)).toHaveTextContent(
+      "Usa la galería para explorar formas, colores y detalles. Puedes solicitar una cita eligiendo un servicio, una fecha y una hora. La solicitud se registra y queda pendiente de confirmación de disponibilidad.",
+    );
+  });
+
+  it("describes contact-page requests as available and pending confirmation", () => {
+    renderApp("/contact");
+
+    expect(
+      screen.getByText(
+        "Solicitudes de cita disponibles, pendientes de confirmación",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: "Solicita tu cita" }),
+    ).toHaveLength(2);
+    expect(
+      screen.getByText(/Las solicitudes de cita se registran/),
+    ).toHaveTextContent(
+      "Las solicitudes de cita se registran y quedan pendientes de confirmación de disponibilidad.",
+    );
+  });
+});

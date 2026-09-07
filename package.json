@@ -7,8 +7,9 @@
     "node": "^22.12.0 || >=24.0.0"
   },
   "scripts": {
-    "dev": "pnpm --filter @glamurosas/client run dev",
-    "build": "pnpm --filter @glamurosas/client run build",
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm --filter @glamurosas/shared run build && pnpm --filter @glamurosas/client run build",
+    "start": "pnpm --filter @glamurosas/server run start",
     "preview": "pnpm --filter @glamurosas/client run preview",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
