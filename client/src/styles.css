@@ -2081,8 +2081,11 @@ p {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: respeta la preferencia de movimiento reducido del usuario */
     scroll-behavior: auto !important;
+    /* biome-ignore lint/complexity/noImportantStyles: respeta la preferencia de movimiento reducido del usuario */
     transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: respeta la preferencia de movimiento reducido del usuario */
     animation: none !important;
   }
   .button:hover,

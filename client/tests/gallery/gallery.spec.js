@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { GalleryPage } from "./gallery-page";
 
 test("every gallery filter updates the photos, count, and selected semantics", async ({

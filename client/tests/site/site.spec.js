@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { SitePage } from "./site-page";
 
 test("navigation supports keyboards, escape, route focus, and the not-found path", async ({

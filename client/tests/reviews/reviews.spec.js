@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { ReviewsPage } from "./reviews-page";
 
 test("review validation and keyboard rating work; a safe local review is lost on reload", async ({

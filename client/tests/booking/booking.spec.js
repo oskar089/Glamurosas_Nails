@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { BookingPage } from "./booking-page";
 
 test("service selection carries into the booking demo", async ({ page }) => {
