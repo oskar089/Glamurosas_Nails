@@ -14,14 +14,14 @@ sigue mostrando las imágenes de Unsplash.**
 
 La web tiene 6 fotos, una por cada entrada del array `photos` en `src/content.js`:
 
-| Archivo                | Título                 | Categoría      |
-| ---------------------- | ---------------------- | -------------- |
-| `soft-statement.jpg`   | Una declaración sutil  | gel            |
-| `little-details.jpg`   | Una pequeña nota de amor | decoración de uñas |
-| `modern-muse.jpg`      | Musa moderna           | acrílico       |
-| `less-is-more.jpg`     | El ritual de cuidado   | clásica        |
-| `gloss-edit.jpg`       | El toque de brillo     | gel            |
-| `artful-moment.jpg`    | Un momento creativo    | decoración de uñas |
+| Archivo              | Título                   | Categoría          |
+| -------------------- | ------------------------ | ------------------ |
+| `soft-statement.jpg` | Una declaración sutil    | gel                |
+| `little-details.jpg` | Una pequeña nota de amor | decoración de uñas |
+| `modern-muse.jpg`    | Musa moderna             | acrílico           |
+| `less-is-more.jpg`   | El ritual de cuidado     | clásica            |
+| `gloss-edit.jpg`     | El toque de brillo       | gel                |
+| `artful-moment.jpg`  | Un momento creativo      | decoración de uñas |
 
 ## Requisitos de las imágenes
 
