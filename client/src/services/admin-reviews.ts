@@ -23,8 +23,9 @@ export interface AdminSession {
   email: string;
 }
 
-export interface PendingReview extends Review {
+export interface AdminReview extends Review {
   createdAt: string;
+  status: "pending" | "approved";
 }
 
 function getStoredSession(): AdminSession | null {
@@ -59,17 +60,16 @@ function adminHeaders(accessToken: string): HeadersInit {
   return supabaseHeaders(config, accessToken);
 }
 
-function toPendingReview(row: AdminReviewRow): PendingReview | null {
+function toAdminReview(
+  row: AdminReviewRow,
+  status: "pending" | "approved",
+): AdminReview | null {
   const review = toReview(row);
-  if (
-    !review ||
-    row.status !== "pending" ||
-    typeof row.created_at !== "string"
-  ) {
+  if (!review || row.status !== status || typeof row.created_at !== "string") {
     return null;
   }
 
-  return { ...review, createdAt: row.created_at };
+  return { ...review, status, createdAt: row.created_at };
 }
 
 export function getAdminSession(): AdminSession | null {
@@ -117,34 +117,54 @@ export async function signInAdmin(
   return session;
 }
 
-export async function getPendingReviews(
+async function getAdminReviewsByStatus(
   session: AdminSession,
-): Promise<PendingReview[]> {
+  status: "pending" | "approved",
+): Promise<AdminReview[]> {
   const config = getSupabaseConfig();
   if (!config) {
     throw new Error("Supabase no está configurado.");
   }
 
+  const errorMessage =
+    status === "pending"
+      ? "No se pudieron cargar las reseñas pendientes."
+      : "No se pudieron cargar las reseñas publicadas.";
+
   let response: Response;
   try {
     response = await fetch(
-      `${config.url}${REVIEWS_ENDPOINT}?select=id,name,rating,comment,status,created_at&status=eq.pending&order=created_at.asc`,
+      `${config.url}${REVIEWS_ENDPOINT}?select=id,name,rating,comment,status,created_at&status=eq.${status}&order=created_at.asc`,
       { headers: adminHeaders(session.accessToken) },
     );
   } catch {
-    throw new Error("No se pudieron cargar las reseñas pendientes.");
+    throw new Error(errorMessage);
   }
 
   if (!response.ok) {
-    throw new Error("No se pudieron cargar las reseñas pendientes.");
+    throw new Error(errorMessage);
   }
 
   const data: unknown = await response.json();
   if (!Array.isArray(data)) {
-    throw new Error("No se pudieron cargar las reseñas pendientes.");
+    throw new Error(errorMessage);
   }
 
-  return data.flatMap((row) => toPendingReview(row as AdminReviewRow) ?? []);
+  return data.flatMap(
+    (row) => toAdminReview(row as AdminReviewRow, status) ?? [],
+  );
+}
+
+export function getPendingReviews(
+  session: AdminSession,
+): Promise<AdminReview[]> {
+  return getAdminReviewsByStatus(session, "pending");
+}
+
+export function getPublishedReviews(
+  session: AdminSession,
+): Promise<AdminReview[]> {
+  return getAdminReviewsByStatus(session, "approved");
 }
 
 export async function updateReviewStatus(

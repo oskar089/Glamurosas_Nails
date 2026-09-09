@@ -1,11 +1,12 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import {
+  type AdminReview,
   type AdminSession,
   clearAdminSession,
   getAdminSession,
   getPendingReviews,
-  type PendingReview,
+  getPublishedReviews,
   signInAdmin,
   updateReviewStatus,
 } from "./services/admin-reviews";
@@ -16,16 +17,18 @@ export function AdminReviews() {
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [reviews, setReviews] = useState<PendingReview[]>([]);
+  const [pendingReviews, setPendingReviews] = useState<AdminReview[]>([]);
+  const [publishedReviews, setPublishedReviews] = useState<AdminReview[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session) return;
-    getPendingReviews(session)
-      .then((pendingReviews) => {
-        setReviews(pendingReviews);
+    Promise.all([getPendingReviews(session), getPublishedReviews(session)])
+      .then(([loadedPendingReviews, loadedPublishedReviews]) => {
+        setPendingReviews(loadedPendingReviews);
+        setPublishedReviews(loadedPublishedReviews);
         setError(null);
       })
       .catch((loadError: unknown) => {
@@ -56,7 +59,7 @@ export function AdminReviews() {
   };
 
   const handleModeration = (
-    review: PendingReview,
+    review: AdminReview,
     status: "approved" | "rejected",
   ) => {
     if (!session) return;
@@ -64,9 +67,15 @@ export function AdminReviews() {
     setError(null);
     updateReviewStatus(session, review.id, status)
       .then(() => {
-        setReviews((current) =>
+        setPendingReviews((current) =>
           current.filter((item) => item.id !== review.id),
         );
+        setPublishedReviews((current) => {
+          const withoutReview = current.filter((item) => item.id !== review.id);
+          return status === "approved"
+            ? [{ ...review, status: "approved" }, ...withoutReview]
+            : withoutReview;
+        });
         setMessage(
           status === "approved"
             ? "Reseña aprobada y publicada."
@@ -86,7 +95,8 @@ export function AdminReviews() {
   const handleLogout = () => {
     clearAdminSession();
     setSession(null);
-    setReviews([]);
+    setPendingReviews([]);
+    setPublishedReviews([]);
     setMessage(null);
     setError(null);
   };
@@ -161,11 +171,11 @@ export function AdminReviews() {
             {error}
           </div>
         )}
-        {reviews.length === 0 ? (
+        {pendingReviews.length === 0 ? (
           <p className="section-note">No hay reseñas pendientes.</p>
         ) : (
           <ul className="reviews-list" aria-label="Reseñas pendientes">
-            {reviews.map((review) => (
+            {pendingReviews.map((review) => (
               <li key={review.id}>
                 <article className="review-card">
                   <div className="review-card-top">
@@ -207,6 +217,52 @@ export function AdminReviews() {
                       onClick={() => handleModeration(review, "rejected")}
                     >
                       Rechazar
+                    </button>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        )}
+        <h2>Reseñas publicadas</h2>
+        {publishedReviews.length === 0 ? (
+          <p className="section-note">No hay reseñas publicadas.</p>
+        ) : (
+          <ul className="reviews-list" aria-label="Reseñas publicadas">
+            {publishedReviews.map((review) => (
+              <li key={review.id}>
+                <article className="review-card">
+                  <div className="review-card-top">
+                    <span
+                      className="stars"
+                      role="img"
+                      aria-label={`${review.rating} de 5 estrellas`}
+                    >
+                      {"★".repeat(review.rating)}
+                      <span className="empty-stars">
+                        {"☆".repeat(5 - review.rating)}
+                      </span>
+                    </span>
+                    <span className="demo-tag">Publicada</span>
+                  </div>
+                  <blockquote>“{review.comment}”</blockquote>
+                  <div className="review-author">
+                    <span className="review-initial" aria-hidden="true">
+                      {review.name.charAt(0).toLowerCase()}
+                    </span>
+                    <div>
+                      <h2>{review.name}</h2>
+                      <p>{new Date(review.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="form-actions">
+                    <button
+                      className="button button-small button-secondary"
+                      type="button"
+                      disabled={busyId === review.id}
+                      onClick={() => handleModeration(review, "rejected")}
+                    >
+                      Ocultar reseña
                     </button>
                   </div>
                 </article>

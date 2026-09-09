@@ -3,6 +3,7 @@ import {
   clearAdminSession,
   getAdminSession,
   getPendingReviews,
+  getPublishedReviews,
   signInAdmin,
   updateReviewStatus,
 } from "./admin-reviews";
@@ -90,6 +91,7 @@ describe("admin review service", () => {
         comment: "Una experiencia preciosa y cuidada.",
         style: "Testimonio compartido",
         example: false,
+        status: "pending",
         createdAt: "2026-04-02T12:00:00.000Z",
       },
     ]);
@@ -101,6 +103,41 @@ describe("admin review service", () => {
           Authorization: `Bearer ${SESSION.accessToken}`,
         }),
       }),
+    );
+  });
+
+  it("loads published reviews for admin management", async () => {
+    vi.stubEnv("VITE_SUPABASE_URL", SUPABASE_URL);
+    vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", PUBLISHABLE_KEY);
+    const fetchMock = vi.fn().mockResolvedValue(
+      jsonResponse([
+        {
+          id: "review-1",
+          name: "Lucía",
+          rating: 5,
+          comment: "Una experiencia preciosa y cuidada.",
+          status: "approved",
+          created_at: "2026-04-02T12:00:00.000Z",
+        },
+      ]),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(getPublishedReviews(SESSION)).resolves.toEqual([
+      {
+        id: "review-1",
+        name: "Lucía",
+        rating: 5,
+        comment: "Una experiencia preciosa y cuidada.",
+        style: "Testimonio compartido",
+        example: false,
+        status: "approved",
+        createdAt: "2026-04-02T12:00:00.000Z",
+      },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${SUPABASE_URL}/rest/v1/reviews?select=id,name,rating,comment,status,created_at&status=eq.approved&order=created_at.asc`,
+      expect.any(Object),
     );
   });
 
