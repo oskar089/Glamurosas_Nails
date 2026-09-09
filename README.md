@@ -1,6 +1,6 @@
-# Glamurosas Nails — vista previa visual con backend persistente
+# Glamurosas Nails — vista previa visual con reservas en Google Calendar
 
-Concepto de estudio de uñas liderado por fotos, con diseño editorial crema y borgoña. Esta versión incluye un cliente React/TypeScript y un backend Fastify que persiste solicitudes de reserva en SQLite local.
+Concepto de estudio de uñas liderado por fotos, con diseño editorial crema y borgoña. Esta versión incluye un cliente React/TypeScript y un backend Fastify que conserva rutas demostrativas no usadas por el flujo de reserva actual.
 
 ## 🚀 Ejecutar localmente
 
@@ -27,7 +27,7 @@ pnpm run build
 pnpm run start
 ```
 
-La versión de producción queda en http://127.0.0.1:4173 y sirve tanto la app como `/api/bookings` desde el mismo origen.
+La versión de producción queda en http://127.0.0.1:4173 y sirve la app desde el mismo origen.
 
 Para revisar solo el cliente compilado con Vite:
 
@@ -39,10 +39,10 @@ pnpm run preview
 
 | Ruta        | Experiencia                                                                                                                   |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `/`         | Portada editorial, servicios, inspiración, reseñas de muestra y enlaces de reserva que envían datos al backend.               |
-| `/services` | Cuatro servicios ejemplo con precios y duraciones ilustrativos en USD; los enlaces preseleccionan el formulario de reserva.   |
+| `/`         | Portada editorial, servicios, inspiración, reseñas de muestra y enlaces hacia la reserva.                                    |
+| `/services` | Tres servicios de ejemplo: manicura refuerzo, acrílicas y pedicura; los enlaces pueden reflejar el servicio elegido.          |
 | `/gallery`  | Seis composiciones de imágenes de banco con filtros: todos, acrílico, gel, arte de uñas y clásico.                            |
-| `/booking`  | Formulario de reserva con nombre, email, servicio, fecha local y hora de ejemplo; al enviar, crea una solicitud persistente.   |
+| `/booking`  | CTA hacia Google Calendar, que muestra la disponibilidad y gestiona los datos de la reserva.                                  |
 | `/reviews`  | Tres reseñas de muestra y formulario accesible de 1–5 estrellas; los comentarios se guardan solo en memoria del cliente.      |
 | `/contact`  | Estado honesto de “próximamente”, sin ubicación, canales de contacto u horarios falsificados.                                |
 | Otras rutas | Página de ruta no encontrada con enlace al inicio.                                                                            |
@@ -51,11 +51,11 @@ La navegación incluye menú móvil accesible, enlace para saltar al contenido, 
 
 ## 🔒 Límites de demo y privacidad
 
-- Usá **datos personales de ejemplo**. Las reservas se envían al backend local y se almacenan en `server/data/glamurosas.db`, ignorado por Git. No se envían a terceros ni se integran con emails, calendarios o sistemas externos de turnos.
-- Las fechas usan el día local del navegador; se rechazan fechas pasadas. Las horas son ejemplos, no disponibilidad real ni horarios de salón.
+- La página de reserva no recopila datos personales localmente. El enlace abre Google Calendar, donde se muestran los horarios disponibles y se gestionan los datos de la cita.
+- La disponibilidad y los datos enviados en Google Calendar se rigen por las políticas de Google.
 - Las reseñas son ejemplos ficticios, no testimonios reales. Una reseña enviada se agrega solo a la memoria del cliente, sobrevive a la navegación interna y desaparece al recargar.
-- Los precios son importes ilustrativos en USD, las duraciones son estimaciones y el arte de uñas se muestra como complemento. Ninguno representa una oferta confirmada del salón.
-- No hay analítica, autenticación ni integraciones de reservas de terceros. El backend es demostrativo y necesitaría endurecimiento antes de producción pública.
+- Los servicios son una vista previa y no representan una oferta confirmada del salón.
+- No hay analítica ni autenticación. El backend demostrativo no participa del flujo de reserva actual y necesitaría endurecimiento antes de producción pública.
 
 ## ✅ Verificación
 
@@ -93,7 +93,7 @@ Ambos navegadores deben instalarse por separado; este repositorio no los descarg
 | ------------------------------- | ----------------------------------------------------------------- |
 | `client/src/main.tsx`           | Inicio de React y configuración del router.                       |
 | `client/src/pages.tsx`          | Páginas visuales principales.                                     |
-| `client/src/forms.tsx`          | Formularios de reserva y reseñas.                                 |
+| `client/src/forms.tsx`          | CTA de reserva en Google Calendar y formulario de reseñas.        |
 | `client/src/components/`        | Distribución y componentes UI compartidos.                        |
 | `client/src/services/`          | Contenido, validadores y cliente API.                             |
 | `client/src/styles.css`         | Sistema visual y estilos adaptables/reduced-motion.               |
@@ -115,11 +115,11 @@ La fotografía se enlaza directamente desde `images.unsplash.com`; **es inspirac
 
 Las imágenes usan dimensiones explícitas y proporciones de recorte. La imagen principal carga con prioridad; las demás imágenes se cargan de forma diferida. Las imágenes fallidas muestran un reemplazo visual con marca y etiqueta. Las categorías de estilo son agrupaciones de inspiración, no técnicas verificadas.
 
-DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sistema sans-serif/Georgia. Los proveedores externos de imágenes y fuentes reciben solicitudes ordinarias de archivos externos, **no valores de formulario**. Antes de un lanzamiento público, reemplazá la fotografía de banco con activos aprobados del salón y confirmá licencias y requisitos de privacidad.
+DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sistema sans-serif/Georgia. Los proveedores externos de imágenes y fuentes reciben solicitudes ordinarias de archivos externos. Google Calendar recibe los datos que la persona complete al usar el enlace de reserva. Antes de un lanzamiento público, reemplazá la fotografía de banco con activos aprobados del salón y confirmá licencias y requisitos de privacidad.
 
 ## 📈 Próximos pasos reales
 
 1. Hacer push de los commits locales cuando decidas publicar esta rama.
 2. Definir datos reales del salón: fotos aprobadas, servicios, precios, ubicación, horarios y canales de contacto.
 3. Antes de producción pública: agregar variables de entorno, protección de abuso, estrategia de backups, base de datos administrada y flujo de despliegue.
-4. Para una fase comercial: integrar calendario, emails de confirmación, autenticación de administrador y panel de gestión de reservas.
+4. Para una fase comercial: definir la gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.

@@ -1,15 +1,11 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Booking, Reviews } from "./forms";
-import { localDateString } from "./services/content";
 
-function localDate(dayOffset: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + dayOffset);
-  return localDateString(date);
-}
+const GOOGLE_CALENDAR_APPOINTMENTS_URL =
+  "https://calendar.google.com/calendar/appointments/schedules/AcZssZ04lNU9EX8RIuRrbaUyWd8jnH7IAIxq9MIWSebI5lJO05QQSgrpNw6kKg2Yy6okKwVWxi59UHyl";
 
 function renderBooking(entry = "/booking") {
   return render(
@@ -27,233 +23,40 @@ function renderReviews() {
   );
 }
 
-async function fillValidBooking(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText("Tu nombre"), "Alex Example");
-  await user.type(
-    screen.getByLabelText("Dirección de correo electrónico"),
-    "alex@example.com",
-  );
-  await user.selectOptions(screen.getByLabelText("Elige tu servicio"), "gel");
-  fireEvent.change(screen.getByLabelText("Fecha preferida"), {
-    target: { value: localDate(1) },
-  });
-  await user.selectOptions(screen.getByLabelText("Hora preferida"), "10:30");
-}
-
-function mockFetchOk(): ReturnType<typeof vi.fn> {
-  const fetchMock = vi.fn().mockResolvedValue({
-    ok: true,
-    status: 201,
-    json: async () => ({ id: 42 }),
-  });
-  vi.stubGlobal("fetch", fetchMock);
-  return fetchMock;
-}
-
 describe("Booking", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
+  it("links to Google Calendar for appointment availability", () => {
+    renderBooking();
+
+    const calendarLink = screen.getByRole("link", {
+      name: "Ver disponibilidad en Google Calendar",
+    });
+    expect(calendarLink).toHaveAttribute(
+      "href",
+      GOOGLE_CALENDAR_APPOINTMENTS_URL,
+    );
+    expect(calendarLink).toHaveAttribute("target", "_blank");
+    expect(
+      screen.getByText(/Google Calendar muestra los horarios disponibles/),
+    ).toBeInTheDocument();
   });
-  it("pre-selects a valid service from the query string", () => {
+
+  it("keeps a valid service preselection in the booking copy", () => {
     renderBooking("/booking?service=acrylic");
-    expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("acrylic");
     expect(
-      screen.getByRole("heading", { name: "Extensiones acrílicas" }),
+      screen.getByRole("heading", { name: "Acrílicas" }),
     ).toBeInTheDocument();
   });
 
-  it("ignores unknown service query values", () => {
+  it("does not render a local booking form", () => {
     renderBooking("/booking?service=unknown");
-    expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("");
-  });
 
-  it("sets the minimum date to the browser-local day", () => {
-    renderBooking();
-    expect(screen.getByLabelText("Fecha preferida")).toHaveAttribute(
-      "min",
-      localDateString(),
-    );
-  });
-
-  it("rejects empty and invalid data with accessible exact Spanish errors", async () => {
-    const user = userEvent.setup();
-    renderBooking();
-
-    await user.click(
-      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
-    );
-
-    const alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("Hay un detalle que requiere tu atención.");
-    expect(alert).toHaveTextContent(
-      "Revisa los campos resaltados a continuación.",
-    );
+    expect(screen.queryByRole("form")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Tu nombre")).not.toBeInTheDocument();
     expect(
-      screen.getByText("Introduce un nombre de al menos 2 caracteres.", {
-        exact: true,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Introduce una dirección de correo electrónico válida.",
-        {
-          exact: true,
-        },
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Elige un servicio.", { exact: true }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Elige una fecha válida.", { exact: true }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Elige una hora de ejemplo.", { exact: true }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText("Tu nombre")).toHaveFocus();
-
-    await fillValidBooking(user);
-    await user.clear(screen.getByLabelText("Dirección de correo electrónico"));
-    await user.type(
-      screen.getByLabelText("Dirección de correo electrónico"),
-      "invalid-email",
-    );
-    fireEvent.change(screen.getByLabelText("Fecha preferida"), {
-      target: { value: localDate(-1) },
-    });
-    await user.click(
-      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
-    );
-
-    expect(
-      screen.getByText(
-        "Introduce una dirección de correo electrónico válida.",
-        {
-          exact: true,
-        },
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Elige hoy o una fecha futura.", { exact: true }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText("SOLICITUD RECIBIDA", { exact: true }),
+      screen.queryByLabelText("Dirección de correo electrónico"),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByLabelText("Dirección de correo electrónico"),
-    ).toHaveFocus();
-  });
-
-  it("sends the booking request to the API, confirms it, and resets the form", async () => {
-    const user = userEvent.setup();
-    const fetchMock = mockFetchOk();
-    renderBooking();
-    await fillValidBooking(user);
-
-    await user.click(
-      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
-    );
-
-    expect(fetchMock).toHaveBeenCalledWith("/api/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Alex Example",
-        email: "alex@example.com",
-        service: "gel",
-        date: localDate(1),
-        time: "10:30",
-        clientToday: localDateString(new Date()),
-      }),
-    });
-
-    const status = await screen.findByRole("status");
-    expect(status).toHaveTextContent("SOLICITUD RECIBIDA");
-    expect(status).toHaveTextContent("Una elección encantadora.");
-    expect(status).toHaveTextContent("Confirmaremos la disponibilidad.");
-    const expectedDate = new Date(
-      `${localDate(1)}T12:00:00`,
-    ).toLocaleDateString("es-ES", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-    expect(status).toHaveTextContent(
-      `Recibimos tu solicitud de cita para Manicura de gel el ${expectedDate} a las 10:30`,
-    );
-    expect(status).toHaveTextContent("Tu solicitud se guardó correctamente.");
-    expect(status).toHaveTextContent(
-      "La disponibilidad de la fecha y hora queda pendiente de confirmación.",
-    );
-
-    await user.click(
-      screen.getByRole("button", { name: "Enviar otra solicitud" }),
-    );
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Tu nombre")).toHaveValue("");
-    expect(
-      screen.getByLabelText("Dirección de correo electrónico"),
-    ).toHaveValue("");
-    expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("");
-  });
-
-  it("shows the server error accessibly and keeps the form values", async () => {
-    const user = userEvent.setup();
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 400,
-      json: async () => ({ error: "Elige un servicio." }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
-    renderBooking();
-    await fillValidBooking(user);
-
-    await user.click(
-      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Elige un servicio.");
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Tu nombre")).toHaveValue("Alex Example");
-    expect(
-      screen.getByLabelText("Dirección de correo electrónico"),
-    ).toHaveValue("alex@example.com");
-    expect(screen.getByLabelText("Elige tu servicio")).toHaveValue("gel");
-  });
-
-  it("disables the submit button and announces the pending state while sending", async () => {
-    let resolveFetch: (value: {
-      ok: boolean;
-      status: number;
-      json: () => Promise<{ id: number }>;
-    }) => void = () => {};
-    const pendingFetch = new Promise<{
-      ok: boolean;
-      status: number;
-      json: () => Promise<{ id: number }>;
-    }>((resolve) => {
-      resolveFetch = resolve;
-    });
-    const fetchMock = vi.fn().mockReturnValue(pendingFetch);
-    vi.stubGlobal("fetch", fetchMock);
-    const user = userEvent.setup();
-    renderBooking();
-    await fillValidBooking(user);
-
-    await user.click(
-      screen.getByRole("button", { name: "Enviar solicitud de cita" }),
-    );
-
-    const sending = await screen.findByRole("button", {
-      name: "Enviando solicitud…",
-    });
-    expect(sending).toBeDisabled();
-
-    resolveFetch({ ok: true, status: 201, json: async () => ({ id: 1 }) });
-    await screen.findByRole("status");
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.queryByLabelText("Fecha preferida")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Hora preferida")).not.toBeInTheDocument();
   });
 });
 

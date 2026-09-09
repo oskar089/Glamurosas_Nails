@@ -3,8 +3,8 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { Footer, Header } from "./layout";
 
-describe("booking request layout copy", () => {
-  it("describes available appointment requests in the banner and navigation", () => {
+describe("booking layout copy", () => {
+  it("describes Google Calendar booking in the banner and navigation", () => {
     render(
       <MemoryRouter>
         <Header />
@@ -14,7 +14,7 @@ describe("booking request layout copy", () => {
 
     expect(
       screen.getByText(
-        "Sitio web en vista previa · solicitudes de cita disponibles",
+        "Sitio web en vista previa · reservas por Google Calendar",
       ),
     ).toBeInTheDocument();
     expect(

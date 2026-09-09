@@ -47,7 +47,7 @@ export function Header() {
     <>
       <div className="demo-banner">
         Una pequeña vista previa de algo hermoso.{" "}
-        <span>Sitio web en vista previa · solicitudes de cita disponibles</span>
+        <span>Sitio web en vista previa · reservas por Google Calendar</span>
         <Sparkle />
       </div>
       {/*
@@ -133,7 +133,7 @@ export function Footer() {
       </div>
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} Glamurosas Nails · Concepto visual</p>
-        <p>Imágenes de inspiración de stock. Precios y reseñas de ejemplo.</p>
+        <p>Imágenes de inspiración de stock y reseñas de ejemplo.</p>
         <span>
           HECHO PARA TU MOMENTO <Sparkle />
         </span>

@@ -11,28 +11,18 @@ import { CATEGORY_IDS, SERVICE_IDS } from "../models/types";
 export const services: Service[] = [
   {
     id: "classic",
-    name: "La manicura clásica",
-    shortName: "Manicura clásica",
+    name: "Manicura refuerzo",
+    shortName: "Manicura refuerzo",
     description:
-      "Un nuevo comienzo para tus manos. Limado, cuidado de cutículas y un acabado de esmalte sencillo y elegante.",
+      "Un acabado pensado para cuidar tus uñas naturales y darles una sensación más firme y prolija.",
     price: 25,
     duration: 40,
-    note: "SENCILLA Y ATEMPORAL",
-  },
-  {
-    id: "gel",
-    name: "El gel distintivo",
-    shortName: "Manicura de gel",
-    description:
-      "Tu día a día, realzado. Un acabado de gel brillante en un tono que se siente totalmente tuyo.",
-    price: 38,
-    duration: 60,
-    note: "UN BRILLO EXTRA",
+    note: "CUIDADO Y FIRMEZA",
   },
   {
     id: "acrylic",
-    name: "El conjunto esculpido",
-    shortName: "Extensiones acrílicas",
+    name: "Acrílicas",
+    shortName: "Acrílicas",
     description:
       "Una nueva forma, un poco más de longitud y una perspectiva renovada. Un conjunto pensado para tu estilo.",
     price: 55,
@@ -41,13 +31,13 @@ export const services: Service[] = [
   },
   {
     id: "nail-art",
-    name: "El detalle creativo",
-    shortName: "Decoración de uñas",
+    name: "Pedicura",
+    shortName: "Pedicura",
     description:
-      "Pequeños lienzos, posibilidades infinitas. Detalles personales, acentos divertidos y acabados creativos.",
+      "Un momento dedicado al cuidado de tus pies, con detalles suaves y un acabado limpio.",
     price: 15,
     duration: 25,
-    note: "HAZLO PERSONAL · COMPLEMENTO",
+    note: "CUIDADO PARA TUS PIES",
   },
 ];
 

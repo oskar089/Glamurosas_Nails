@@ -32,11 +32,7 @@ function Home() {
             EL ARTE DE SENTIRTE BIEN
           </p>
           <h1>
-            Un poco de brillo.
-            <br />
-            Una nueva forma de
-            <br />
-            <em>sentir.</em>
+            Un espacio privado para ti y muchos mimos para tus uñas.
             <Sparkle />
           </h1>
           <p className="hero-description">
@@ -117,8 +113,7 @@ function Home() {
           ))}
         </div>
         <p className="section-note">
-          Precios ilustrativos en USD y duraciones estimadas. No es un menú de
-          servicios en vivo.
+          Vista previa de servicios. No es un menú en vivo.
         </p>
       </section>
       <section className="inspiration-section">
@@ -214,9 +209,8 @@ function Services() {
         <div className="notice">
           <Sparkle />
           <p>
-            <strong>Un primer vistazo al menú.</strong> Todos los precios son
-            montos ilustrativos en USD; las duraciones son ejemplos, no detalles
-            de servicio confirmados. La decoración de uñas es un complemento.
+            <strong>Un primer vistazo al menú.</strong> Los servicios son una
+            vista previa, no detalles confirmados.
           </p>
         </div>
         <div className="service-grid service-grid-full">
@@ -232,10 +226,9 @@ function Services() {
             <em>Un bello comienzo.</em>
           </h2>
           <p>
-            Usa la galería para explorar formas, colores y detalles. Puedes
-            solicitar una cita eligiendo un servicio, una fecha y una hora. La
-            solicitud se registra y queda pendiente de confirmación de
-            disponibilidad.
+            Usa la galería para explorar formas, colores y detalles. Cuando
+            estés lista, consulta y reserva los horarios disponibles en Google
+            Calendar.
           </p>
           <Link className="text-link" to="/gallery">
             Construye tu inspiración <Arrow />
@@ -389,17 +382,15 @@ function Contact() {
             </div>
             <div>
               <dt>Planifica tu momento</dt>
-              <dd>
-                Solicitudes de cita disponibles, pendientes de confirmación
-              </dd>
+              <dd>Reserva disponible mediante Google Calendar</dd>
             </div>
           </dl>
           <Link className="button" to="/booking">
             Solicita tu cita <Arrow diagonal />
           </Link>
           <p className="section-note">
-            Las solicitudes de cita se registran y quedan pendientes de
-            confirmación de disponibilidad.
+            Google Calendar muestra la disponibilidad y gestiona la reserva de
+            tu cita.
           </p>
         </div>
       </section>

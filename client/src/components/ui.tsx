@@ -177,13 +177,6 @@ export function ServiceCard({ service, index }: ServiceCardProps) {
       <h3>{service.shortName}</h3>
       <p>{service.description}</p>
       <div className="service-card-bottom">
-        <div>
-          <strong>
-            ${service.price}
-            <span> / desde</span>
-          </strong>
-          <small>{service.duration} min · ejemplo</small>
-        </div>
         <Link
           className="icon-link"
           to={`/booking?service=${service.id}`}
@@ -245,8 +238,8 @@ export function BookingCallout() {
         Solicita una cita <Arrow />
       </Link>
       <small>
-        La solicitud se registra y queda pendiente de confirmación de
-        disponibilidad.
+        Consulta y reserva los horarios disponibles directamente en Google
+        Calendar.
       </small>
     </section>
   );

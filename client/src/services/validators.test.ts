@@ -11,7 +11,7 @@ const TODAY = "2026-09-07";
 const VALID_BOOKING = {
   name: "Ana Caro",
   email: "ana@example.com",
-  service: "gel",
+  service: "acrylic",
   date: "2026-09-08",
   time: "14:00",
 } as const;

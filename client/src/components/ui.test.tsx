@@ -76,7 +76,7 @@ describe("Photo", () => {
 });
 
 describe("ServiceCard", () => {
-  it("renders the service copy and a labeled booking link", () => {
+  it("renders service copy without price or duration and a labeled booking link", () => {
     render(
       <MemoryRouter>
         <ServiceCard service={service} index={2} />
@@ -86,9 +86,7 @@ describe("ServiceCard", () => {
     const card = screen.getByRole("article");
     expect(card).toHaveTextContent("Manicura de gel");
     expect(card).toHaveTextContent("UN BRILLO EXTRA");
-    expect(card).toHaveTextContent("$38");
-    expect(card).toHaveTextContent("/ desde");
-    expect(card).toHaveTextContent("60 min · ejemplo");
+    expect(card).not.toHaveTextContent(/\$38|USD|desde|60 min|duración/i);
     expect(card).toHaveTextContent("03");
 
     const link = screen.getByRole("link", {
@@ -141,7 +139,7 @@ describe("ReviewCard", () => {
 });
 
 describe("BookingCallout", () => {
-  it("describes a registered request pending availability confirmation", () => {
+  it("directs visitors to Google Calendar availability through the booking page", () => {
     render(
       <MemoryRouter>
         <BookingCallout />
@@ -151,8 +149,10 @@ describe("BookingCallout", () => {
     expect(
       screen.getByRole("link", { name: "Solicita una cita" }),
     ).toHaveAttribute("href", "/booking");
-    expect(screen.getByText(/La solicitud se registra/)).toHaveTextContent(
-      "La solicitud se registra y queda pendiente de confirmación de disponibilidad.",
+    expect(
+      screen.getByText(/Consulta y reserva los horarios disponibles/),
+    ).toHaveTextContent(
+      "Consulta y reserva los horarios disponibles directamente en Google Calendar.",
     );
   });
 });

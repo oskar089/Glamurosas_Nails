@@ -89,30 +89,28 @@ describe("Header navigation", () => {
   });
 });
 
-describe("Booking request copy", () => {
-  it("describes service-page requests as pending availability confirmation", () => {
+describe("Google Calendar booking copy", () => {
+  it("directs service-page visitors to Google Calendar availability", () => {
     renderApp("/services");
 
-    expect(screen.getByText(/Puedes solicitar una cita/)).toHaveTextContent(
-      "Usa la galería para explorar formas, colores y detalles. Puedes solicitar una cita eligiendo un servicio, una fecha y una hora. La solicitud se registra y queda pendiente de confirmación de disponibilidad.",
+    expect(screen.getByText(/Cuando estés lista/)).toHaveTextContent(
+      "Usa la galería para explorar formas, colores y detalles. Cuando estés lista, consulta y reserva los horarios disponibles en Google Calendar.",
     );
   });
 
-  it("describes contact-page requests as available and pending confirmation", () => {
+  it("describes Google Calendar as the contact-page booking flow", () => {
     renderApp("/contact");
 
     expect(
-      screen.getByText(
-        "Solicitudes de cita disponibles, pendientes de confirmación",
-      ),
+      screen.getByText("Reserva disponible mediante Google Calendar"),
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole("link", { name: "Solicita tu cita" }),
     ).toHaveLength(2);
     expect(
-      screen.getByText(/Las solicitudes de cita se registran/),
+      screen.getByText(/Google Calendar muestra la disponibilidad/),
     ).toHaveTextContent(
-      "Las solicitudes de cita se registran y quedan pendientes de confirmación de disponibilidad.",
+      "Google Calendar muestra la disponibilidad y gestiona la reserva de tu cita.",
     );
   });
 });
