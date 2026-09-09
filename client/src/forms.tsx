@@ -13,12 +13,11 @@ import {
   Sparkle,
 } from "./components/ui";
 import type { Review, ReviewFormValues } from "./models/types";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "./services/booking";
 import { isServiceId, services } from "./services/content";
 import { getApprovedReviews, submitReview } from "./services/reviews";
 import { reviewSchema } from "./services/validators";
 
-const GOOGLE_CALENDAR_APPOINTMENTS_URL =
-  "https://calendar.google.com/calendar/appointments/schedules/AcZssZ04lNU9EX8RIuRrbaUyWd8jnH7IAIxq9MIWSebI5lJO05QQSgrpNw6kKg2Yy6okKwVWxi59UHyl";
 const REVIEW_FIELDS = ["name", "rating", "comment"] as const;
 
 function toErrorRecord<Name extends string>(

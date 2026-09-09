@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import type {
   Photo as PhotoModel,
   Review,
   Service,
   ServiceId,
 } from "../models/types";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "../services/booking";
 
 interface ArrowProps {
   diagonal?: boolean;
@@ -177,13 +177,15 @@ export function ServiceCard({ service, index }: ServiceCardProps) {
       <h3>{service.shortName}</h3>
       <p>{service.description}</p>
       <div className="service-card-bottom">
-        <Link
+        <a
           className="icon-link"
-          to={`/booking?service=${service.id}`}
-          aria-label={`Probar la cita para ${service.shortName}`}
+          href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`Solicitar cita para ${service.shortName}`}
         >
           <Arrow diagonal />
-        </Link>
+        </a>
       </div>
     </article>
   );
@@ -234,9 +236,14 @@ export function BookingCallout() {
         <em>Un nuevo estilo.</em>
       </h2>
       <p>Encuentra tu inspiración. Reserva un pequeño espacio para ti.</p>
-      <Link className="button button-light" to="/booking">
+      <a
+        className="button button-light"
+        href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+        target="_blank"
+        rel="noreferrer"
+      >
         Solicita una cita <Arrow />
-      </Link>
+      </a>
       <small>
         Consulta y reserva los horarios disponibles directamente en Google
         Calendar.

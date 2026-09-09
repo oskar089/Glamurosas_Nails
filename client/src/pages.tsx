@@ -14,6 +14,7 @@ import {
 import { AppErrorFallback } from "./error-boundary";
 import { Booking, Reviews } from "./forms";
 import type { CategoryId } from "./models/types";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "./services/booking";
 import { categories, isCategoryId, photos, services } from "./services/content";
 
 function Home() {
@@ -34,9 +35,14 @@ function Home() {
             tuyo. Te damos la bienvenida a Glamurosas Nails.
           </p>
           <div className="hero-actions">
-            <Link className="button" to="/booking">
+            <a
+              className="button"
+              href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
               Encuentra tu estilo perfecto <Arrow diagonal />
-            </Link>
+            </a>
             <Link className="text-link" to="/gallery">
               Explora la galería <Arrow />
             </Link>
@@ -385,9 +391,14 @@ function Contact() {
               <dd>Lunes a viernes, de 9:30 a. m. a 6:00 p. m.</dd>
             </div>
           </dl>
-          <Link className="button" to="/booking">
+          <a
+            className="button"
+            href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
             Solicita tu cita <Arrow diagonal />
-          </Link>
+          </a>
           <p className="section-note">
             Google Calendar muestra la disponibilidad y gestiona la reserva de
             tu cita.

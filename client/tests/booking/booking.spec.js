@@ -1,21 +1,14 @@
 import { expect, test } from "@playwright/test";
 import { BookingPage, GOOGLE_CALENDAR_APPOINTMENTS_URL } from "./booking-page";
 
-test("service selection carries into the Calendar booking page", async ({
-  page,
-}) => {
+test("service cards link directly to Google Calendar", async ({ page }) => {
   const booking = new BookingPage(page);
   await booking.blockExternalAssets();
   await booking.goto("/services");
-  await page
-    .getByRole("link", { name: "Probar la cita para Acrílicas" })
-    .click();
 
   await expect(
-    page.getByRole("heading", { name: "Acrílicas", exact: true }),
-  ).toBeVisible();
-  await expect(booking.calendarLink).toBeVisible();
-  await expect(booking.main).toBeFocused();
+    page.getByRole("link", { name: "Solicitar cita para Acrílicas" }),
+  ).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
 });
 
 test("booking page uses Google Calendar instead of a local form", async ({

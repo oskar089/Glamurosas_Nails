@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import type { Photo as PhotoModel, Review, Service } from "../models/types";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "../services/booking";
 import {
   BookingCallout,
   ErrorSummary,
@@ -90,9 +91,9 @@ describe("ServiceCard", () => {
     expect(card).toHaveTextContent("03");
 
     const link = screen.getByRole("link", {
-      name: "Probar la cita para Manicura de gel",
+      name: "Solicitar cita para Manicura de gel",
     });
-    expect(link).toHaveAttribute("href", "/booking?service=gel");
+    expect(link).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
   });
 });
 
@@ -146,7 +147,7 @@ describe("BookingCallout", () => {
 
     expect(
       screen.getByRole("link", { name: "Solicita una cita" }),
-    ).toHaveAttribute("href", "/booking");
+    ).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
     expect(
       screen.getByText(/Consulta y reserva los horarios disponibles/),
     ).toHaveTextContent(

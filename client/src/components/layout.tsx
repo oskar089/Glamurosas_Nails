@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "../services/booking";
 import { Arrow, Sparkle } from "./ui";
 
 export const NAVIGATION = [
@@ -92,9 +93,14 @@ export function Header() {
                   {item.label}
                 </NavLink>
               ))}
-              <Link className="button button-small" to="/booking">
+              <a
+                className="button button-small"
+                href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Solicita tu cita <Arrow diagonal />
-              </Link>
+              </a>
             </nav>
           </div>
         </header>
@@ -120,7 +126,13 @@ export function Footer() {
           <nav aria-label="Navegación del pie de página">
             <Link to="/services">El menú de servicios</Link>
             <Link to="/gallery">La edición de inspiración</Link>
-            <Link to="/booking">Solicita una cita</Link>
+            <a
+              href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Solicita una cita
+            </a>
           </nav>
         </div>
         <div>

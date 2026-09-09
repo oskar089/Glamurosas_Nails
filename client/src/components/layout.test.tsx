@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
+import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "../services/booking";
 import { Footer, Header } from "./layout";
 
 describe("booking layout copy", () => {
@@ -19,11 +20,11 @@ describe("booking layout copy", () => {
       within(
         screen.getByRole("navigation", { name: "Navegación principal" }),
       ).getByRole("link", { name: "Solicita tu cita" }),
-    ).toHaveAttribute("href", "/booking");
+    ).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
     expect(
       within(screen.getByRole("contentinfo")).getByRole("link", {
         name: "Solicita una cita",
       }),
-    ).toHaveAttribute("href", "/booking");
+    ).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
   });
 });
