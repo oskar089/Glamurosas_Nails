@@ -346,24 +346,33 @@ function Contact() {
           <h2>
             Hagámoslo
             <br />
-            <em>personal. Pronto.</em>
+            <em>personal.</em>
           </h2>
           <p>
-            Reservá tu cita desde Google Calendar y consultá los canales de
-            contacto disponibles para coordinar tu experiencia.
+            Reservá tu cita desde Google Calendar o escribinos por WhatsApp para
+            coordinar tu experiencia en Zona Amate.
           </p>
           <dl>
             <div>
               <dt>Visita el estudio</dt>
-              <dd>Ubicación por anunciar</dd>
+              <dd>Zona Amate</dd>
             </div>
             <div>
               <dt>Ponte en contacto</dt>
-              <dd>Canales de contacto próximamente</dd>
+              <dd>
+                <a
+                  className="text-link"
+                  href="https://wa.me/34643521975"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WhatsApp 643 521 975 <Arrow diagonal />
+                </a>
+              </dd>
             </div>
             <div>
-              <dt>Planifica tu momento</dt>
-              <dd>Reserva disponible mediante Google Calendar</dd>
+              <dt>Horario</dt>
+              <dd>De 9:30 a. m. a 6:00 p. m.</dd>
             </div>
           </dl>
           <Link className="button" to="/booking">

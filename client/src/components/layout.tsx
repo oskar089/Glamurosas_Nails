@@ -125,10 +125,15 @@ export function Footer() {
         </div>
         <div>
           <h2>Mantengámonos en contacto</h2>
-          <p>Consultá la disponibilidad y prepará tu próxima cita.</p>
-          <Link className="text-link" to="/contact">
-            Ver contacto <Arrow diagonal />
-          </Link>
+          <p>Zona Amate · 9:30 a. m. a 6:00 p. m.</p>
+          <a
+            className="text-link"
+            href="https://wa.me/34643521975"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp 643 521 975 <Arrow diagonal />
+          </a>
         </div>
       </div>
       <div className="footer-bottom">

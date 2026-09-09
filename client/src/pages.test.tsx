@@ -98,19 +98,18 @@ describe("Google Calendar booking copy", () => {
     );
   });
 
-  it("describes Google Calendar as the contact-page booking flow", () => {
+  it("shows the real contact area, WhatsApp and opening hours", () => {
     renderApp("/contact");
 
-    expect(
-      screen.getByText("Reserva disponible mediante Google Calendar"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Zona Amate")).toBeInTheDocument();
+    expect(screen.getByText("De 9:30 a. m. a 6:00 p. m.")).toBeInTheDocument();
+    for (const whatsappLink of screen.getAllByRole("link", {
+      name: "WhatsApp 643 521 975",
+    })) {
+      expect(whatsappLink).toHaveAttribute("href", "https://wa.me/34643521975");
+    }
     expect(
       screen.getAllByRole("link", { name: "Solicita tu cita" }),
     ).toHaveLength(2);
-    expect(
-      screen.getByText(/Google Calendar muestra la disponibilidad/),
-    ).toHaveTextContent(
-      "Google Calendar muestra la disponibilidad y gestiona la reserva de tu cita.",
-    );
   });
 });
