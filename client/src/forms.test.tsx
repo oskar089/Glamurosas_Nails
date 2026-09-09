@@ -1,11 +1,40 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Booking, Reviews } from "./forms";
 
 const GOOGLE_CALENDAR_APPOINTMENTS_URL =
   "https://calendar.google.com/calendar/appointments/schedules/AcZssZ04lNU9EX8RIuRrbaUyWd8jnH7IAIxq9MIWSebI5lJO05QQSgrpNw6kKg2Yy6okKwVWxi59UHyl";
+
+function configureSupabaseReviews(reviews: unknown[] = []) {
+  vi.stubEnv("VITE_SUPABASE_URL", "https://project.supabase.co");
+  vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "publishable-key");
+  const fetchMock = vi.fn((_url: string, init?: RequestInit) => {
+    if (init?.method === "POST") {
+      return Promise.resolve(new Response(null, { status: 201 }));
+    }
+    return Promise.resolve(
+      new Response(JSON.stringify(reviews), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+}
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
 
 function renderBooking(entry = "/booking") {
   return render(
@@ -83,6 +112,11 @@ describe("Reviews", () => {
       "Hay un detalle que requiere tu atención.",
     );
     expect(
+      screen.getByText("Escribe un nombre de al menos 2 caracteres.", {
+        exact: true,
+      }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText("Elige una valoración de 1 a 5 estrellas.", {
         exact: true,
       }),
@@ -92,10 +126,9 @@ describe("Reviews", () => {
         exact: true,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "1 estrella" })).toHaveFocus();
+    expect(screen.getByLabelText("Tu nombre (obligatorio)")).toHaveFocus();
 
     const firstStar = screen.getByRole("radio", { name: "1 estrella" });
-    expect(firstStar).toHaveFocus();
     // user-event's keyboard {Space} does not activate radios under jsdom;
     // this keydown -> click -> keyup sequence mirrors the user-agent
     // activation that Playwright's e2e tests exercise in a real browser.
@@ -104,6 +137,7 @@ describe("Reviews", () => {
     fireEvent.keyUp(firstStar, { key: " " });
     expect(firstStar).toBeChecked();
 
+    await user.type(screen.getByLabelText("Tu nombre (obligatorio)"), "Lucía");
     await user.type(
       screen.getByLabelText("Tus comentarios (obligatorios)"),
       "Short",
@@ -118,10 +152,12 @@ describe("Reviews", () => {
     ).toBeInTheDocument();
   });
 
-  it("adds a valid review locally, announces it, and resets the form", async () => {
+  it("submits a valid review as pending and resets the form", async () => {
     const user = userEvent.setup();
+    const fetchMock = configureSupabaseReviews();
     renderReviews();
 
+    await user.type(screen.getByLabelText("Tu nombre (obligatorio)"), "Lucía");
     await user.click(screen.getByRole("radio", { name: "5 estrellas" }));
     const comment = "Un detalle precioso y muy cuidado.";
     await user.type(
@@ -134,20 +170,27 @@ describe("Reviews", () => {
       screen.getByRole("button", { name: "Compartir mi experiencia" }),
     );
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Gracias por compartir tu reseña. Tus palabras ya forman parte de esta experiencia.",
-    );
-    const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(1);
-    const firstReview = within(articles[0]);
-    expect(firstReview.getByRole("blockquote")).toHaveTextContent(comment);
     expect(
-      firstReview.getByRole("img", { name: "5 de 5 estrellas" }),
+      await screen.findByText(
+        "Gracias por compartir tu reseña. La revisaremos antes de publicarla para cuidar este espacio.",
+      ),
     ).toBeInTheDocument();
-    expect(
-      firstReview.getByRole("heading", { name: "Tu reseña" }),
-    ).toBeInTheDocument();
-    expect(firstReview.getByText("Reseña compartida")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "https://project.supabase.co/rest/v1/reviews",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            name: "Lucía",
+            rating: 5,
+            comment,
+            status: "pending",
+          }),
+        }),
+      );
+    });
+    expect(screen.queryAllByRole("article")).toHaveLength(0);
+    expect(screen.getByLabelText("Tu nombre (obligatorio)")).toHaveValue("");
     expect(screen.getByLabelText("Tus comentarios (obligatorios)")).toHaveValue(
       "",
     );
@@ -156,23 +199,21 @@ describe("Reviews", () => {
     ).not.toBeChecked();
   });
 
-  it("renders markup inside a comment as plain text, never as HTML", async () => {
-    const user = userEvent.setup();
-    const { container } = renderReviews();
-
+  it("renders markup inside an approved comment as plain text, never as HTML", async () => {
     const sample =
       "A beautiful sample <img src=x onerror=alert(1)> experience.";
-    await user.click(screen.getByRole("radio", { name: "5 estrellas" }));
-    await user.type(
-      screen.getByLabelText("Tus comentarios (obligatorios)"),
-      sample,
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Compartir mi experiencia" }),
-    );
+    configureSupabaseReviews([
+      {
+        id: "review-1",
+        name: "Lucía",
+        rating: 5,
+        comment: sample,
+      },
+    ]);
+    const { container } = renderReviews();
 
+    const firstReview = within(await screen.findByRole("article"));
     expect(container.querySelectorAll("img")).toHaveLength(0);
-    const firstReview = within(screen.getAllByRole("article")[0]);
     expect(firstReview.getByRole("blockquote")).toHaveTextContent(sample);
   });
 });

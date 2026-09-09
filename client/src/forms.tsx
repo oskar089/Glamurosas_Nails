@@ -12,18 +12,14 @@ import {
   ReviewCard,
   Sparkle,
 } from "./components/ui";
-import type { Review } from "./models/types";
+import type { Review, ReviewFormValues } from "./models/types";
 import { isServiceId, services } from "./services/content";
+import { getApprovedReviews, submitReview } from "./services/reviews";
 import { reviewSchema } from "./services/validators";
-
-interface ReviewFormData {
-  rating: number;
-  comment: string;
-}
 
 const GOOGLE_CALENDAR_APPOINTMENTS_URL =
   "https://calendar.google.com/calendar/appointments/schedules/AcZssZ04lNU9EX8RIuRrbaUyWd8jnH7IAIxq9MIWSebI5lJO05QQSgrpNw6kKg2Yy6okKwVWxi59UHyl";
-const REVIEW_FIELDS = ["rating", "comment"] as const;
+const REVIEW_FIELDS = ["name", "rating", "comment"] as const;
 
 function toErrorRecord<Name extends string>(
   names: readonly Name[],
@@ -132,57 +128,79 @@ export function Booking() {
 }
 
 export function Reviews() {
-  const [localReviews, setLocalReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     watch,
     setValue,
     reset,
     trigger,
     formState: { errors },
-  } = useForm<ReviewFormData>({
+  } = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
-    defaultValues: { rating: 0, comment: "" },
+    defaultValues: { name: "", rating: 0, comment: "" },
   });
 
+  const name = watch("name") ?? "";
   const rating = watch("rating");
   const comment = watch("comment") ?? "";
   const errorRecord = toErrorRecord(REVIEW_FIELDS, errors);
+  const nameRef = useRef<HTMLInputElement | null>(null);
   const ratingRef = useRef<HTMLInputElement | null>(null);
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
-    if (errors.rating) {
+    if (errors.name) {
+      nameRef.current?.focus();
+    } else if (errors.rating) {
       ratingRef.current?.focus();
     } else if (errors.comment) {
       commentRef.current?.focus();
     }
-  }, [errors.rating, errors.comment]);
+  }, [errors.name, errors.rating, errors.comment]);
 
-  const onValidSubmit = (data: ReviewFormData) => {
-    setLocalReviews((current) => [
-      {
-        id: crypto.randomUUID(),
-        name: "Tu reseña",
-        rating: data.rating,
-        comment: data.comment.trim(),
-        style: "Gracias por compartir tu experiencia",
-        example: false,
-      },
-      ...current,
-    ]);
-    reset({ rating: 0, comment: "" });
-    setSubmitted(true);
+  useEffect(() => {
+    getApprovedReviews()
+      .then((approvedReviews) => {
+        setReviews(approvedReviews);
+        setLoadError(null);
+      })
+      .catch((error: unknown) => {
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "No se pudieron cargar las reseñas.",
+        );
+      });
+  }, []);
+
+  const onValidSubmit = async (data: ReviewFormValues) => {
+    setSubmitError(null);
+    try {
+      await submitReview(data);
+      reset({ name: "", rating: 0, comment: "" });
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitted(false);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo enviar tu reseña. Inténtalo de nuevo más tarde.",
+      );
+    }
   };
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const result = reviewSchema.safeParse({
+      name,
       rating,
       comment,
     });
     if (result.success) {
-      onValidSubmit(result.data);
+      void onValidSubmit(result.data);
     } else {
       void trigger();
     }
@@ -214,9 +232,9 @@ export function Reviews() {
           </p>
         </div>
         <div className="reviews-layout">
-          {localReviews.length > 0 ? (
+          {reviews.length > 0 ? (
             <ul className="reviews-list" aria-label="Reseñas compartidas">
-              {localReviews.map((review) => (
+              {reviews.map((review) => (
                 <li key={review.id}>
                   <ReviewCard review={review} />
                 </li>
@@ -226,8 +244,8 @@ export function Reviews() {
             <div className="notice" role="status">
               <Sparkle />
               <p>
-                Todavía no hay reseñas visibles. Sé la primera persona en dejar
-                unas palabras bonitas sobre tu experiencia.
+                {loadError ??
+                  "Todavía no hay reseñas visibles. Sé la primera persona en dejar unas palabras bonitas sobre tu experiencia."}
               </p>
             </div>
           )}
@@ -241,11 +259,38 @@ export function Reviews() {
               </p>
               {submitted && (
                 <div className="success-note" role="status">
-                  Gracias por compartir tu reseña. Tus palabras ya forman parte
-                  de esta experiencia.
+                  Gracias por compartir tu reseña. La revisaremos antes de
+                  publicarla para cuidar este espacio.
+                </div>
+              )}
+              {submitError && (
+                <div className="error-summary" role="alert">
+                  {submitError}
                 </div>
               )}
               <ErrorSummary errors={errorRecord} />
+              <div className="field">
+                <label htmlFor="review-name">Tu nombre (obligatorio)</label>
+                <input
+                  id="review-name"
+                  ref={nameRef}
+                  type="text"
+                  value={name}
+                  onChange={(event) => {
+                    setValue("name", event.target.value);
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  }}
+                  maxLength={80}
+                  required
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? "name-error" : undefined}
+                />
+                <FieldErrorMessage
+                  id="name"
+                  error={errors.name?.message ?? undefined}
+                />
+              </div>
               <fieldset
                 className="rating-field"
                 aria-describedby={errors.rating ? "rating-error" : undefined}
@@ -267,6 +312,7 @@ export function Reviews() {
                         onChange={() => {
                           setValue("rating", value);
                           setSubmitted(false);
+                          setSubmitError(null);
                         }}
                         aria-label={`${value} ${value === 1 ? "estrella" : "estrellas"}`}
                         aria-invalid={Boolean(errors.rating)}
@@ -295,6 +341,7 @@ export function Reviews() {
                   onChange={(event) => {
                     setValue("comment", event.target.value);
                     setSubmitted(false);
+                    setSubmitError(null);
                   }}
                   placeholder="¿Qué haría especial tu experiencia ideal de cuidado de uñas?"
                   rows={5}

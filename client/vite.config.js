@@ -17,7 +17,7 @@ export default defineConfig({
     strictPort: true,
     headers: {
       "Content-Security-Policy":
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com; connect-src 'self' https://bnnrfmhavoysycwzzzfa.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'",
       "Referrer-Policy": "strict-origin-when-cross-origin",
     },
   },

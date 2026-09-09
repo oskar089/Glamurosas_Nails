@@ -132,13 +132,16 @@ describe("bookingRequestSchema", () => {
   });
 });
 
+const VALID_REVIEW = {
+  name: "Lucía",
+  rating: 5,
+  comment: "Comentario valido",
+} as const;
+
 describe("reviewSchema", () => {
   it("rejects ratings outside 1..5 with the exact Spanish message", () => {
     for (const rating of [0, 6]) {
-      const result = reviewSchema.safeParse({
-        rating,
-        comment: "Comentario valido",
-      });
+      const result = reviewSchema.safeParse({ ...VALID_REVIEW, rating });
       expect(result.success).toBe(false);
       expect(issueMessages(result)).toContain(
         "Elige una valoración de 1 a 5 estrellas.",
@@ -148,17 +151,14 @@ describe("reviewSchema", () => {
 
   it("accepts ratings between 1 and 5", () => {
     for (const rating of [1, 3, 5]) {
-      const result = reviewSchema.safeParse({
-        rating,
-        comment: "Comentario valido",
-      });
+      const result = reviewSchema.safeParse({ ...VALID_REVIEW, rating });
       expect(result.success).toBe(true);
     }
   });
 
   it("requires a comment of at least 10 characters after trimming", () => {
     for (const comment of ["", "short", "   abc   "]) {
-      const result = reviewSchema.safeParse({ rating: 5, comment });
+      const result = reviewSchema.safeParse({ ...VALID_REVIEW, comment });
       expect(result.success).toBe(false);
       expect(issueMessages(result)).toContain(
         "Escribe al menos 10 caracteres para tu reseña.",
@@ -168,7 +168,7 @@ describe("reviewSchema", () => {
 
   it("rejects comments over 600 characters", () => {
     const result = reviewSchema.safeParse({
-      rating: 5,
+      ...VALID_REVIEW,
       comment: "a".repeat(601),
     });
     expect(result.success).toBe(false);
@@ -179,14 +179,14 @@ describe("reviewSchema", () => {
 
   it("accepts comments of exactly 10 and 600 characters", () => {
     for (const comment of ["a".repeat(10), "a".repeat(600)]) {
-      const result = reviewSchema.safeParse({ rating: 5, comment });
+      const result = reviewSchema.safeParse({ ...VALID_REVIEW, comment });
       expect(result.success).toBe(true);
     }
   });
 
   it("keeps markup in the comment as plain data (rendering escapes it)", () => {
     const result = reviewSchema.safeParse({
-      rating: 5,
+      ...VALID_REVIEW,
       comment: "Un comentario <img src=x onerror=alert(1)> de prueba",
     });
     expect(result.success).toBe(true);

@@ -3,6 +3,19 @@ import type { BookingFormValues } from "../models/types";
 import { demoTimes, localDateString, services } from "./content";
 
 export const reviewSchema = z.object({
+  name: z.string().superRefine((value, context) => {
+    if (value.trim().length < 2) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Escribe un nombre de al menos 2 caracteres.",
+      });
+    } else if (value.trim().length > 80) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Mantén tu nombre por debajo de 80 caracteres.",
+      });
+    }
+  }),
   rating: z.number().superRefine((value, context) => {
     if (value < 1 || value > 5) {
       context.addIssue({

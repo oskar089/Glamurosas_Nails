@@ -52,6 +52,7 @@ export interface BookingFormValues {
 }
 
 export interface ReviewFormValues {
+  name: string;
   rating: number;
   comment: string;
 }

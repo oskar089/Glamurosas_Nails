@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { ReviewsPage } from "./reviews-page";
 
-test("review validation and keyboard rating work; a safe local review is lost on reload", async ({
+test("review validation and keyboard rating work without local persistence", async ({
   page,
 }) => {
   const reviews = new ReviewsPage(page);
@@ -10,9 +10,9 @@ test("review validation and keyboard rating work; a safe local review is lost on
   await expect(reviews.reviews).toHaveCount(0);
   await reviews.submit.click();
   await expect(page.getByRole("alert")).toBeVisible();
-  await expect(
-    page.getByRole("radio", { name: "1 estrella", exact: true }),
-  ).toBeFocused();
+  await expect(reviews.name).toBeFocused();
+  await reviews.name.fill("Lucía");
+  await page.getByRole("radio", { name: "1 estrella", exact: true }).focus();
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowRight");
@@ -35,16 +35,10 @@ test("review validation and keyboard rating work; a safe local review is lost on
     if (request.method() !== "GET") writes.push(request.url());
   });
   await reviews.submit.click();
-  await expect(page.getByRole("status")).toContainText(
-    "Gracias por compartir tu reseña.",
+  await expect(page.getByRole("alert")).toContainText(
+    "El servicio de reseñas no está disponible.",
   );
-  await expect(reviews.reviews).toHaveCount(1);
-  await expect(reviews.reviews.first()).toContainText(sample);
-  await expect(reviews.reviews.first().getByRole("img")).toHaveCount(1);
-  await expect(reviews.reviews.first().getByRole("img")).toHaveAttribute(
-    "aria-label",
-    "5 de 5 estrellas",
-  );
+  await expect(reviews.reviews).toHaveCount(0);
   expect(writes).toEqual([]);
   expect(
     await page.evaluate(() => ({
@@ -52,7 +46,7 @@ test("review validation and keyboard rating work; a safe local review is lost on
       session: sessionStorage.length,
     })),
   ).toEqual({ local: 0, session: 0 });
-  await expect(reviews.comment).toHaveValue("");
+  await expect(reviews.comment).toHaveValue(sample);
   await page.reload({ waitUntil: "domcontentloaded" });
   await expect(reviews.reviews).toHaveCount(0);
   await expect(page.getByText(sample, { exact: false })).toHaveCount(0);

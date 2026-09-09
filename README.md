@@ -53,9 +53,20 @@ La navegación incluye menú móvil accesible, enlace para saltar al contenido, 
 
 - La página de reserva no recopila datos personales localmente. El enlace abre Google Calendar, donde se muestran los horarios disponibles y se gestionan los datos de la cita.
 - La disponibilidad y los datos enviados en Google Calendar se rigen por las políticas de Google.
-- El formulario de reseñas no integra todavía una base de datos pública; las reseñas visibles se manejan en la sesión del navegador.
+- Las reseñas se guardan en Supabase como `pending` y solo se muestran cuando estén aprobadas.
 - No hay analítica ni autenticación en el cliente público.
 - El backend Fastify incluido en el repositorio se conserva para desarrollo local y futuras integraciones, pero el despliegue actual de Vercel sirve el cliente estático.
+
+## 🗄️ Supabase
+
+El cliente usa estas variables de entorno de Vite:
+
+```txt
+VITE_SUPABASE_URL=https://bnnrfmhavoysycwzzzfa.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+```
+
+En Vercel se configuran en `Settings → Environment Variables`. La tabla de reseñas y sus políticas RLS están en `supabase/migrations/20260402120000_create_reviews.sql`.
 
 ## ✅ Verificación
 
@@ -120,5 +131,5 @@ DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sist
 ## 📈 Próximos pasos reales
 
 1. Reemplazar la fotografía de banco por fotos aprobadas del Instagram del salón cuando estén disponibles.
-2. Integrar almacenamiento real para reseñas si se quieren publicar testimonios permanentes.
+2. Crear panel privado para aprobar o rechazar reseñas pendientes.
 3. Para una fase comercial: definir gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.

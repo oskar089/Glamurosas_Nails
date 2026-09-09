@@ -3,6 +3,9 @@ import { BasePage } from "../base-page";
 export class ReviewsPage extends BasePage {
   constructor(page) {
     super(page);
+    this.name = page.getByLabel("Tu nombre (obligatorio)", {
+      exact: true,
+    });
     this.comment = page.getByLabel("Tus comentarios (obligatorios)", {
       exact: true,
     });
