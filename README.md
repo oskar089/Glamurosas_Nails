@@ -1,102 +1,125 @@
-# Glamurosas Nails — visual preview
+# Glamurosas Nails — vista previa visual con backend persistente
 
-A photo-led nail studio concept with an editorial cream-and-burgundy design. This first version is a **client-only demo**: it does not create appointments, send emails, publish reviews, or connect to a backend.
+Concepto de estudio de uñas liderado por fotos, con diseño editorial crema y borgoña. Esta versión incluye un cliente React/TypeScript y un backend Fastify que persiste solicitudes de reserva en SQLite local.
 
-## Run locally
+## 🚀 Ejecutar localmente
 
-Use Node.js **22.12+ or 24+** and pnpm. The implementation was installed with Node **24.16.0** and pnpm **11.8.0**.
+Requisitos: Node.js **22.12+ o 24+** y pnpm. Probado con Node **24.16.0** y pnpm **11.8.0**.
 
-From the project root:
+Desde la raíz del proyecto:
 
 ```sh
 pnpm install
 pnpm run dev
 ```
 
-Open **http://127.0.0.1:5173**. The port is fixed; Vite exits rather than silently switching if it is occupied. Stop the server with `Ctrl+C`.
+Esto inicia concurrentemente:
+
+- **Servidor de desarrollo Vite** en http://127.0.0.1:5173 para el cliente React.
+- **Servidor Fastify** en http://127.0.0.1:4173 para la API y la vista previa compilada cuando exista `client/dist/`.
+
+En desarrollo, Vite redirige `/api` hacia el servidor Fastify. Detené ambos procesos con `Ctrl+C`.
+
+Para preparar y servir la versión de producción completa:
 
 ```sh
 pnpm run build
+pnpm run start
+```
+
+La versión de producción queda en http://127.0.0.1:4173 y sirve tanto la app como `/api/bookings` desde el mismo origen.
+
+Para revisar solo el cliente compilado con Vite:
+
+```sh
 pnpm run preview
 ```
 
-The production preview runs at **http://127.0.0.1:4173**. Build output is `client/dist/`.
+## 🧪 Qué podés probar
 
-## What you can try
+| Ruta        | Experiencia                                                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `/`         | Portada editorial, servicios, inspiración, reseñas de muestra y enlaces de reserva que envían datos al backend.               |
+| `/services` | Cuatro servicios ejemplo con precios y duraciones ilustrativos en USD; los enlaces preseleccionan el formulario de reserva.   |
+| `/gallery`  | Seis composiciones de imágenes de banco con filtros: todos, acrílico, gel, arte de uñas y clásico.                            |
+| `/booking`  | Formulario de reserva con nombre, email, servicio, fecha local y hora de ejemplo; al enviar, crea una solicitud persistente.   |
+| `/reviews`  | Tres reseñas de muestra y formulario accesible de 1–5 estrellas; los comentarios se guardan solo en memoria del cliente.      |
+| `/contact`  | Estado honesto de “próximamente”, sin ubicación, canales de contacto u horarios falsificados.                                |
+| Otras rutas | Página de ruta no encontrada con enlace al inicio.                                                                            |
 
-| Route       | Experience                                                                                                 |
-| ----------- | ---------------------------------------------------------------------------------------------------------- |
-| `/`         | Editorial hero, services, inspiration, sample reviews, and booking links                                   |
-| `/services` | Four example services with illustrative USD prices and durations; service links preselect the booking form |
-| `/gallery`  | Six stock-image compositions with All, Acrylic, Gel, Nail art, and Classic filters                         |
-| `/booking`  | Name, email, service, local date, and example time validation; explicit demo-only confirmation             |
-| `/reviews`  | Three labeled sample reviews and a keyboard-accessible 1–5 rating/comment form                             |
-| `/contact`  | Honest coming-soon state with no fabricated location, contact channels, or hours                           |
-| Other paths | Not-found page with a home link                                                                            |
+La navegación incluye menú móvil accesible, enlace para saltar al contenido, estados de foco visibles y foco del área principal al cambiar de ruta. Los diseños se adaptan a pantallas pequeñas y respetan la preferencia de movimiento reducido.
 
-Navigation includes an accessible mobile menu, a skip link, visible focus states, and main-landmark focus on route changes. Layouts adapt to small screens and respect reduced-motion preferences.
+## 🔒 Límites de demo y privacidad
 
-## Demo and privacy boundaries
+- Usá **datos personales de ejemplo**. Las reservas se envían al backend local y se almacenan en `server/data/glamurosas.db`, ignorado por Git. No se envían a terceros ni se integran con emails, calendarios o sistemas externos de turnos.
+- Las fechas usan el día local del navegador; se rechazan fechas pasadas. Las horas son ejemplos, no disponibilidad real ni horarios de salón.
+- Las reseñas son ejemplos ficticios, no testimonios reales. Una reseña enviada se agrega solo a la memoria del cliente, sobrevive a la navegación interna y desaparece al recargar.
+- Los precios son importes ilustrativos en USD, las duraciones son estimaciones y el arte de uñas se muestra como complemento. Ninguno representa una oferta confirmada del salón.
+- No hay analítica, autenticación ni integraciones de reservas de terceros. El backend es demostrativo y necesitaría endurecimiento antes de producción pública.
 
-- Please use **sample personal details**. Booking values stay in component memory, are cleared after success or leaving the route, and are never transmitted or written to browser storage. No calendar, email, reservation, or appointment is created.
-- Booking dates use the browser’s local day. Past dates are rejected. Times are **examples**, not availability or salon hours; this demo is not a scheduling engine.
-- Reviews are fictional examples, not real testimonials. A submitted demo review is added only to application memory, survives internal navigation, and disappears on reload. Nothing is published. React renders comments as text.
-- Prices are illustrative USD amounts, durations are estimates, and nail art is shown as an add-on. None is a confirmed salon offering.
-- There is no server, database, authentication, analytics, third-party booking integration, or secret configuration.
-
-## Verify
+## ✅ Verificación
 
 ```sh
 pnpm run format:check
-pnpm run build
+pnpm --filter @glamurosas/client run typecheck
+pnpm --filter @glamurosas/client run test:unit
+pnpm --filter @glamurosas/server run typecheck
+pnpm run lint
 pnpm test
 ```
 
-The Playwright suite runs against the production build at port **4173**, starts and stops its own preview server, and refuses to reuse another running server. Build before testing and leave port 4173 free.
+La suite de Playwright se ejecuta contra la vista previa de producción en el puerto **4173**, inicia y detiene su propio servidor, y no reutiliza otro servidor en ejecución. Dejá libre el puerto 4173 antes de correrla.
 
-The production preview sends a restrictive Content Security Policy: scripts and connections are same-origin, with only the documented image/font providers allowed for assets. Vite development mode keeps its normal hot-reload behavior; a deployed host must reproduce the preview security headers in `client/vite.config.js`.
+La vista previa de producción envía una Política de Seguridad de Contenido restrictiva: scripts y conexiones de mismo origen, con solo los proveedores documentados de imágenes y fuentes permitidos para archivos externos. Vite mantiene su comportamiento normal de recarga en caliente durante desarrollo; un host desplegado debe reproducir los encabezados de seguridad definidos en `client/vite.config.js`.
 
-Behavior tests block third-party requests from initial navigation to isolate the application, including an antivirus script observed injecting traffic into local HTTP pages on this machine. Submission listeners still count all attempted requests; no antivirus host is silently excluded from assertions. CSP alone did not prevent the host security software’s traffic. Visual-reference tests retain external access for the real photography and fonts.
+Las pruebas de comportamiento bloquean solicitudes de terceros desde la navegación inicial para aislar la aplicación, incluyendo tráfico observado por software antivirus en páginas HTTP locales. Las pruebas de referencia visual conservan el acceso externo para la fotografía y las fuentes reales.
 
-Tests use **locally installed Microsoft Edge**, with desktop (1440px) and mobile-emulated (390px) projects plus 320px checks. No browser download is needed on the implementation machine. To use an installed Google Chrome in PowerShell:
+Las pruebas usan **Microsoft Edge instalado localmente**, con proyectos de escritorio (1440px), móvil emulado (390px) y chequeos de 320px. Para usar Google Chrome instalado en PowerShell:
 
 ```powershell
 $env:PLAYWRIGHT_CHANNEL = "chrome"
 pnpm test
 ```
 
-Both browsers must be installed independently; this repository does not install them. Tests cover gallery filters, image fallback, booking validation and privacy, timezone boundaries, safe local review rendering, reload behavior, keyboard navigation, and overflow. Two visual-reference tests need Unsplash and Google Fonts access; other scenarios block those external assets. Screenshots and failure traces go into ignored `test-results/`.
+Ambos navegadores deben instalarse por separado; este repositorio no los descarga. Las capturas de pantalla y trazas de fallo van a `test-results/`, ignorado por Git.
 
-## Stack and files
+## 📦 Tecnología y archivos
 
-- React **18.3.1**, React DOM **18.3.1**, React Router DOM **7.18.3**.
-- Vite **8.2.2**, React plugin **6.1.1**, JavaScript/JSX, plain CSS. No React Compiler or React 19-only APIs.
-- Playwright **1.63.0** and Prettier **3.6.2**. Exact installed dependencies are locked in `pnpm-lock.yaml`.
+- **Cliente**: React **19.2.8**, React DOM **19.2.8**, React Router DOM **7.18.3**, React Hook Form, Zod y TypeScript.
+- **Servidor**: Fastify **5**, `node:sqlite` y TypeScript.
+- **Herramientas**: Vite **8.2.2**, plugin React **6.1.1**, Biome, Playwright **1.63.0**, Vitest + Testing Library.
 
-| File                        | Responsibility                                     |
-| --------------------------- | -------------------------------------------------- |
-| `client/src/App.jsx`        | Routes, header/footer, and visual pages            |
-| `client/src/forms.jsx`      | Local-only booking and review interactions         |
-| `client/src/components.jsx` | Shared visual components and photo fallback        |
-| `client/src/content.js`     | Example content, photo IDs, and date validation    |
-| `client/src/styles.css`     | Visual system and responsive/reduced-motion styles |
-| `client/tests/`             | Focused browser tests and page objects             |
-| `client/vite.config.js`     | Fixed loopback dev and preview ports               |
-| `playwright.config.js`      | Bounded browser verification and server lifecycle  |
+| Archivo                         | Responsabilidad                                                   |
+| ------------------------------- | ----------------------------------------------------------------- |
+| `client/src/main.tsx`           | Inicio de React y configuración del router.                       |
+| `client/src/pages.tsx`          | Páginas visuales principales.                                     |
+| `client/src/forms.tsx`          | Formularios de reserva y reseñas.                                 |
+| `client/src/components/`        | Distribución y componentes UI compartidos.                        |
+| `client/src/services/`          | Contenido, validadores y cliente API.                             |
+| `client/src/styles.css`         | Sistema visual y estilos adaptables/reduced-motion.               |
+| `client/tests/`                 | Pruebas browser y objetos de página de Playwright.                |
+| `server/src/index.ts`           | Punto de entrada Fastify, archivos estáticos y fallback SPA.      |
+| `server/src/db.ts`              | Configuración y migración mínima de SQLite.                       |
+| `server/src/routes/bookings.ts` | API para crear solicitudes de reserva.                            |
+| `shared/src/index.ts`           | Tipos y validaciones compartidas entre cliente y servidor.        |
+| `playwright.config.js`          | Configuración de verificación browser y ciclo de vida del server. |
 
-## External assets
+## 🖼️ Activos externos
 
-Photography is hotlinked from `images.unsplash.com`; **it is stock inspiration, not salon portfolio work**. Six compositions use these four photographs, including two alternate crops:
+La fotografía se enlaza directamente desde `images.unsplash.com`; **es inspiración de banco, no trabajo de portafolio del salón**. Seis composiciones usan estas cuatro fotografías, incluyendo dos recortes alternos:
 
 - `photo-1604654894610-df63bc536371`
 - `photo-1632345031435-8727f6897d53`
 - `photo-1610992015732-2449b76344bc`
 - `photo-1519014816548-bf5fe059798b`
 
-Images use explicit dimensions and crop ratios. The hero is eager/high-priority; other images are lazy-loaded. Failed images show a branded, labeled fallback. Style categories are mood-board groupings, not verified treatment techniques.
+Las imágenes usan dimensiones explícitas y proporciones de recorte. La imagen principal carga con prioridad; las demás imágenes se cargan de forma diferida. Las imágenes fallidas muestran un reemplazo visual con marca y etiqueta. Las categorías de estilo son agrupaciones de inspiración, no técnicas verificadas.
 
-DM Sans and Playfair Display load from Google Fonts with system sans-serif/Georgia fallbacks. External image and font providers receive ordinary asset requests (including network metadata), **not form values**. They need an internet connection and may become unavailable. Before public release, replace stock photography with approved salon assets and confirm applicable image/font licensing and privacy requirements.
+DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sistema sans-serif/Georgia. Los proveedores externos de imágenes y fuentes reciben solicitudes ordinarias de archivos externos, **no valores de formulario**. Antes de un lanzamiento público, reemplazá la fotografía de banco con activos aprobados del salón y confirmá licencias y requisitos de privacidad.
 
-## Next step
+## 📈 Próximos pasos reales
 
-Review the visual direction and supply approved salon photography, real services/prices, and contact details. Production scheduling, data protection, backend persistence, and integrations are intentionally a later phase. A deployed static host must rewrite application routes to `index.html` for direct URL access.
+1. Hacer push de los commits locales cuando decidas publicar esta rama.
+2. Definir datos reales del salón: fotos aprobadas, servicios, precios, ubicación, horarios y canales de contacto.
+3. Antes de producción pública: agregar variables de entorno, protección de abuso, estrategia de backups, base de datos administrada y flujo de despliegue.
+4. Para una fase comercial: integrar calendario, emails de confirmación, autenticación de administrador y panel de gestión de reservas.
