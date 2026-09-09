@@ -66,7 +66,21 @@ VITE_SUPABASE_URL=https://bnnrfmhavoysycwzzzfa.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
 ```
 
-En Vercel se configuran en `Settings → Environment Variables`. La tabla de reseñas y sus políticas RLS están en `supabase/migrations/20260402120000_create_reviews.sql`.
+En Vercel se configuran en `Settings → Environment Variables`.
+
+Las migraciones de Supabase están en:
+
+```txt
+supabase/migrations/20260402120000_create_reviews.sql
+supabase/migrations/20260402123000_add_review_admins.sql
+```
+
+Para administrar reseñas:
+
+1. Creá un usuario en `Authentication → Users`.
+2. Copiá su `User UID`.
+3. Insertalo en `public.review_admins`.
+4. Entrá a `/admin` con ese email y contraseña.
 
 ## ✅ Verificación
 
@@ -131,5 +145,5 @@ DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sist
 ## 📈 Próximos pasos reales
 
 1. Reemplazar la fotografía de banco por fotos aprobadas del Instagram del salón cuando estén disponibles.
-2. Crear panel privado para aprobar o rechazar reseñas pendientes.
-3. Para una fase comercial: definir gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.
+2. Crear gestión de reservas que complemente Google Calendar.
+3. Reemplazar progresivamente las fotos de banco por fotos aprobadas del salón.

@@ -2,7 +2,7 @@ import type { Review, ReviewFormValues } from "../models/types";
 
 const REVIEWS_ENDPOINT = "/rest/v1/reviews";
 
-interface SupabaseConfig {
+export interface SupabaseConfig {
   url: string;
   publishableKey: string;
 }
@@ -14,7 +14,7 @@ interface ReviewRow {
   comment: unknown;
 }
 
-function getSupabaseConfig(): SupabaseConfig | null {
+export function getSupabaseConfig(): SupabaseConfig | null {
   const url = import.meta.env.VITE_SUPABASE_URL?.trim();
   const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
 
@@ -25,15 +25,18 @@ function getSupabaseConfig(): SupabaseConfig | null {
   return { url: url.replace(/\/$/, ""), publishableKey };
 }
 
-function headers(config: SupabaseConfig): HeadersInit {
+export function supabaseHeaders(
+  config: SupabaseConfig,
+  accessToken = config.publishableKey,
+): HeadersInit {
   return {
     apikey: config.publishableKey,
-    Authorization: `Bearer ${config.publishableKey}`,
+    Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
   };
 }
 
-function toReview(row: ReviewRow): Review | null {
+export function toReview(row: ReviewRow): Review | null {
   if (
     typeof row.id !== "string" ||
     typeof row.name !== "string" ||
@@ -66,7 +69,7 @@ export async function getApprovedReviews(): Promise<Review[]> {
   try {
     response = await fetch(
       `${config.url}${REVIEWS_ENDPOINT}?select=id,name,rating,comment&status=eq.approved&order=created_at.desc`,
-      { headers: headers(config) },
+      { headers: supabaseHeaders(config) },
     );
   } catch {
     throw new Error("No se pudieron cargar las reseñas.");
@@ -94,7 +97,7 @@ export async function submitReview(input: ReviewFormValues): Promise<void> {
   try {
     response = await fetch(`${config.url}${REVIEWS_ENDPOINT}`, {
       method: "POST",
-      headers: { ...headers(config), Prefer: "return=minimal" },
+      headers: { ...supabaseHeaders(config), Prefer: "return=minimal" },
       body: JSON.stringify({
         name: input.name.trim(),
         rating: input.rating,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
+import { AdminReviews } from "./admin";
 import { Footer, Header, PageIntro, RouteEffects } from "./components/layout";
 import {
   Arrow,
@@ -437,6 +438,7 @@ export function App() {
             <Route path="/booking" element={<Booking />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<AdminReviews />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>

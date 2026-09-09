@@ -1163,6 +1163,17 @@ p {
   position: sticky;
   top: 25px;
 }
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.button-secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: #d8bbb8;
+}
 .rating-field {
   border: 0;
   padding: 0;

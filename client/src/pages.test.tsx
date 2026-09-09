@@ -89,6 +89,19 @@ describe("Header navigation", () => {
   });
 });
 
+describe("Admin route", () => {
+  it("renders the private reviews panel login", () => {
+    renderApp("/admin");
+
+    expect(
+      screen.getByRole("heading", { name: "Administrar reseñas" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Entrar al panel" }),
+    ).toHaveAttribute("type", "submit");
+  });
+});
+
 describe("Google Calendar booking copy", () => {
   it("directs service-page visitors to Google Calendar availability", () => {
     renderApp("/services");
