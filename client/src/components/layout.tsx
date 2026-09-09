@@ -46,8 +46,8 @@ export function Header() {
   return (
     <>
       <div className="demo-banner">
-        Una pequeña vista previa de algo hermoso.{" "}
-        <span>Sitio web en vista previa · reservas por Google Calendar</span>
+        Un espacio para mimarte las manos.{" "}
+        <span>Reservas disponibles por Google Calendar</span>
         <Sparkle />
       </div>
       {/*
@@ -125,15 +125,15 @@ export function Footer() {
         </div>
         <div>
           <h2>Mantengámonos en contacto</h2>
-          <p>Los datos de contacto del salón llegarán pronto.</p>
+          <p>Consultá la disponibilidad y prepará tu próxima cita.</p>
           <Link className="text-link" to="/contact">
-            Acerca de esta vista previa <Arrow diagonal />
+            Ver contacto <Arrow diagonal />
           </Link>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} Glamurosas Nails · Concepto visual</p>
-        <p>Imágenes de inspiración de stock y reseñas de ejemplo.</p>
+        <p>© {new Date().getFullYear()} Glamurosas Nails</p>
+        <p>Inspiración visual, servicios y reservas en un solo lugar.</p>
         <span>
           HECHO PARA TU MOMENTO <Sparkle />
         </span>
@@ -148,9 +148,7 @@ export function RouteEffects() {
   useEffect(() => {
     const name =
       NAVIGATION.find((item) => item.to === pathname)?.label ||
-      (pathname === "/booking"
-        ? "Demostración de cita"
-        : "Página no encontrada");
+      (pathname === "/booking" ? "Reserva de cita" : "Página no encontrada");
     document.title = `${name} | Glamurosas Nails`;
     if (previousPath.current !== pathname) {
       window.scrollTo({ top: 0, behavior: "instant" });

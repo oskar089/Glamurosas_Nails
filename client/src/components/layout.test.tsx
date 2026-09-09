@@ -13,9 +13,7 @@ describe("booking layout copy", () => {
     );
 
     expect(
-      screen.getByText(
-        "Sitio web en vista previa · reservas por Google Calendar",
-      ),
+      screen.getByText("Reservas disponibles por Google Calendar"),
     ).toBeInTheDocument();
     expect(
       within(

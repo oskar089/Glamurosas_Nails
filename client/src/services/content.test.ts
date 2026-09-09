@@ -3,7 +3,6 @@ import { CATEGORY_IDS, SERVICE_IDS } from "../models/types";
 import {
   categories,
   demoTimes,
-  exampleReviews,
   isCategoryId,
   isServiceId,
   localDateString,
@@ -108,21 +107,6 @@ describe("photos data", () => {
       expect(photo.alt.trim()).not.toBe("");
       expect(CATEGORY_IDS).toContain(photo.category);
       expect(photo.category).not.toBe("all");
-    }
-  });
-});
-
-describe("exampleReviews data", () => {
-  it("has three unique example reviews with ratings 1..5", () => {
-    expect(exampleReviews).toHaveLength(3);
-    expect(allUnique(exampleReviews.map((review) => review.id))).toBe(true);
-    for (const review of exampleReviews) {
-      expect(review.rating).toBeGreaterThanOrEqual(1);
-      expect(review.rating).toBeLessThanOrEqual(5);
-      expect(review.name.trim()).not.toBe("");
-      expect(review.comment.trim()).not.toBe("");
-      expect(review.style.trim()).not.toBe("");
-      expect(review.example).toBe(true);
     }
   });
 });

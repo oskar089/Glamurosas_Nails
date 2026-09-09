@@ -7,7 +7,7 @@ export class ReviewsPage extends BasePage {
       exact: true,
     });
     this.submit = page.getByRole("button", {
-      name: "Añadir una reseña de demostración",
+      name: "Compartir mi experiencia",
     });
     this.reviews = this.main.getByRole("article");
   }

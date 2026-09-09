@@ -13,7 +13,7 @@ import {
   Sparkle,
 } from "./components/ui";
 import type { Review } from "./models/types";
-import { exampleReviews, isServiceId, services } from "./services/content";
+import { isServiceId, services } from "./services/content";
 import { reviewSchema } from "./services/validators";
 
 interface ReviewFormData {
@@ -163,10 +163,10 @@ export function Reviews() {
     setLocalReviews((current) => [
       {
         id: crypto.randomUUID(),
-        name: "Tu reseña de demostración",
+        name: "Tu reseña",
         rating: data.rating,
         comment: data.comment.trim(),
-        style: "Visible solo en esta sesión del navegador",
+        style: "Gracias por compartir tu experiencia",
         example: false,
       },
       ...current,
@@ -201,45 +201,48 @@ export function Reviews() {
         <p>
           Cada pequeño ritual tiene una historia.
           <br />
-          Explora los ejemplos a continuación o prueba a dejar una reseña de
-          demostración.
+          Tus palabras ayudan a que otras personas se animen a vivir la suya.
         </p>
       </PageIntro>
       <section className="container page-section">
         <div className="notice">
           <Sparkle />
           <p>
-            <strong>
-              Estas son reseñas de ejemplo, no testimonios reales.
-            </strong>{" "}
-            No representan clientes verificados ni valoraciones reales. Tu
-            reseña de demostración no se publica y desaparece al recargar la
-            página.
+            <strong>Tu experiencia importa.</strong> Compartí unas palabras
+            simples sobre tu visita: qué te gustó, cómo te sentiste o qué
+            detalle recomendarías a otra persona.
           </p>
         </div>
         <div className="reviews-layout">
-          <ul
-            className="reviews-list"
-            aria-label="Reseñas de ejemplo y demostraciones locales"
-          >
-            {[...localReviews, ...exampleReviews].map((review) => (
-              <li key={review.id}>
-                <ReviewCard review={review} />
-              </li>
-            ))}
-          </ul>
+          {localReviews.length > 0 ? (
+            <ul className="reviews-list" aria-label="Reseñas compartidas">
+              {localReviews.map((review) => (
+                <li key={review.id}>
+                  <ReviewCard review={review} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="notice" role="status">
+              <Sparkle />
+              <p>
+                Todavía no hay reseñas visibles. Sé la primera persona en dejar
+                unas palabras bonitas sobre tu experiencia.
+              </p>
+            </div>
+          )}
           <div className="form-panel review-form-panel">
             <form noValidate onSubmit={onSubmit}>
-              <p className="eyebrow">PRUEBA LA EXPERIENCIA</p>
-              <h2>Unas palabras bonitas</h2>
+              <p className="eyebrow">DEJÁ TU HUELLA</p>
+              <h2>Contanos tu experiencia</h2>
               <p className="form-description">
-                Usa solo contenido de ejemplo. Tu valoración y comentario
-                permanecen en memoria, nunca se envían y se pierden al recargar.
+                Tu valoración ayuda a transmitir confianza y cercanía a quienes
+                están pensando en reservar.
               </p>
               {submitted && (
                 <div className="success-note" role="status">
-                  Tu reseña de demostración se añadió solo a esta página. No se
-                  publica y desaparecerá al recargar.
+                  Gracias por compartir tu reseña. Tus palabras ya forman parte
+                  de esta experiencia.
                 </div>
               )}
               <ErrorSummary errors={errorRecord} />
@@ -313,10 +316,10 @@ export function Reviews() {
                 )}
               </div>
               <button className="button button-full" type="submit">
-                Añadir una reseña de demostración <Arrow />
+                Compartir mi experiencia <Arrow />
               </button>
               <p className="submit-note">
-                Solo una vista previa local. No se publica nada.
+                Gracias por tomarte un momento para acompañar este espacio.
               </p>
             </form>
           </div>

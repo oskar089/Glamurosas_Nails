@@ -2,7 +2,6 @@ import type {
   Category,
   CategoryId,
   Photo,
-  Review,
   Service,
   ServiceId,
 } from "../models/types";
@@ -98,36 +97,6 @@ export const categories: Category[] = [
   { id: "gel", label: "Gel" },
   { id: "nail-art", label: "Decoración de uñas" },
   { id: "classic", label: "Clásica" },
-];
-
-export const exampleReviews: Review[] = [
-  {
-    id: "example-1",
-    name: "Una pausa cotidiana",
-    rating: 5,
-    comment:
-      "Un momento para bajar el ritmo, elegir un color bonito y salir sintiéndome más yo misma. Justo el tipo de ritual que me encanta.",
-    style: "Manicura clásica",
-    example: true,
-  },
-  {
-    id: "example-2",
-    name: "Un detalle para recordar",
-    rating: 5,
-    comment:
-      "Tonos suaves, detalles cuidados y un toque diferente. Mi inspiración para un conjunto que combina con todo.",
-    style: "Manicura de gel",
-    example: true,
-  },
-  {
-    id: "example-3",
-    name: "Espacio para crear",
-    rating: 4,
-    comment:
-      "Me encanta la idea de llevar un panel de inspiración y convertirlo en algo personal. Un lienzo pequeño para mucha personalidad.",
-    style: "Decoración de uñas",
-    example: true,
-  },
 ];
 
 export const demoTimes = [

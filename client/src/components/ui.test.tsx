@@ -118,20 +118,18 @@ describe("ReviewCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("marks local reviews as demonstrations, not examples", () => {
+  it("marks submitted reviews as shared reviews", () => {
     const review: Review = {
       id: "local-1",
-      name: "Tu reseña de demostración",
+      name: "Tu reseña",
       rating: 4,
       comment: "Un detalle precioso.",
-      style: "Visible solo en esta sesión del navegador",
+      style: "Gracias por compartir tu experiencia",
       example: false,
     };
     render(<ReviewCard review={review} />);
 
-    expect(screen.getByRole("article")).toHaveTextContent(
-      "Tu demostración local",
-    );
+    expect(screen.getByRole("article")).toHaveTextContent("Reseña compartida");
     expect(
       screen.getByRole("img", { name: "4 de 5 estrellas" }),
     ).toBeInTheDocument();

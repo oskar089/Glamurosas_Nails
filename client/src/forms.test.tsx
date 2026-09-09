@@ -61,13 +61,13 @@ describe("Booking", () => {
 });
 
 describe("Reviews", () => {
-  it("starts with the three example reviews in a labeled list", () => {
+  it("starts without example reviews and invites the first real review", () => {
     renderReviews();
-    expect(screen.getAllByRole("article")).toHaveLength(3);
+    expect(screen.queryAllByRole("article")).toHaveLength(0);
     expect(
-      screen.getByRole("list", {
-        name: "Reseñas de ejemplo y demostraciones locales",
-      }),
+      screen.getByText(
+        "Todavía no hay reseñas visibles. Sé la primera persona en dejar unas palabras bonitas sobre tu experiencia.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -76,7 +76,7 @@ describe("Reviews", () => {
     renderReviews();
 
     await user.click(
-      screen.getByRole("button", { name: "Añadir una reseña de demostración" }),
+      screen.getByRole("button", { name: "Compartir mi experiencia" }),
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
@@ -88,10 +88,9 @@ describe("Reviews", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Escribe al menos 10 caracteres para tu reseña de demostración.",
-        { exact: true },
-      ),
+      screen.getByText("Escribe al menos 10 caracteres para tu reseña.", {
+        exact: true,
+      }),
     ).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "1 estrella" })).toHaveFocus();
 
@@ -110,13 +109,12 @@ describe("Reviews", () => {
       "Short",
     );
     await user.click(
-      screen.getByRole("button", { name: "Añadir una reseña de demostración" }),
+      screen.getByRole("button", { name: "Compartir mi experiencia" }),
     );
     expect(
-      screen.getByText(
-        "Escribe al menos 10 caracteres para tu reseña de demostración.",
-        { exact: true },
-      ),
+      screen.getByText("Escribe al menos 10 caracteres para tu reseña.", {
+        exact: true,
+      }),
     ).toBeInTheDocument();
   });
 
@@ -133,23 +131,23 @@ describe("Reviews", () => {
     expect(screen.getByText(`${comment.length}/600`)).toBeInTheDocument();
 
     await user.click(
-      screen.getByRole("button", { name: "Añadir una reseña de demostración" }),
+      screen.getByRole("button", { name: "Compartir mi experiencia" }),
     );
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Tu reseña de demostración se añadió solo a esta página. No se publica y desaparecerá al recargar.",
+      "Gracias por compartir tu reseña. Tus palabras ya forman parte de esta experiencia.",
     );
     const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(4);
+    expect(articles).toHaveLength(1);
     const firstReview = within(articles[0]);
     expect(firstReview.getByRole("blockquote")).toHaveTextContent(comment);
     expect(
       firstReview.getByRole("img", { name: "5 de 5 estrellas" }),
     ).toBeInTheDocument();
     expect(
-      firstReview.getByRole("heading", { name: "Tu reseña de demostración" }),
+      firstReview.getByRole("heading", { name: "Tu reseña" }),
     ).toBeInTheDocument();
-    expect(firstReview.getByText("Tu demostración local")).toBeInTheDocument();
+    expect(firstReview.getByText("Reseña compartida")).toBeInTheDocument();
     expect(screen.getByLabelText("Tus comentarios (obligatorios)")).toHaveValue(
       "",
     );
@@ -170,7 +168,7 @@ describe("Reviews", () => {
       sample,
     );
     await user.click(
-      screen.getByRole("button", { name: "Añadir una reseña de demostración" }),
+      screen.getByRole("button", { name: "Compartir mi experiencia" }),
     );
 
     expect(container.querySelectorAll("img")).toHaveLength(0);

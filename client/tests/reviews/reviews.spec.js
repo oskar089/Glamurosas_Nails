@@ -7,7 +7,7 @@ test("review validation and keyboard rating work; a safe local review is lost on
   const reviews = new ReviewsPage(page);
   await reviews.blockExternalAssets();
   await reviews.goto("/reviews");
-  await expect(reviews.reviews).toHaveCount(3);
+  await expect(reviews.reviews).toHaveCount(0);
   await reviews.submit.click();
   await expect(page.getByRole("alert")).toBeVisible();
   await expect(
@@ -24,10 +24,9 @@ test("review validation and keyboard rating work; a safe local review is lost on
   await reviews.comment.fill("Short");
   await reviews.submit.click();
   await expect(
-    page.getByText(
-      "Escribe al menos 10 caracteres para tu reseña de demostración.",
-      { exact: true },
-    ),
+    page.getByText("Escribe al menos 10 caracteres para tu reseña.", {
+      exact: true,
+    }),
   ).toBeVisible();
   const sample = "A beautiful sample <img src=x onerror=alert(1)> experience.";
   await reviews.comment.fill(sample);
@@ -37,9 +36,9 @@ test("review validation and keyboard rating work; a safe local review is lost on
   });
   await reviews.submit.click();
   await expect(page.getByRole("status")).toContainText(
-    "No se publica y desaparecerá al recargar.",
+    "Gracias por compartir tu reseña.",
   );
-  await expect(reviews.reviews).toHaveCount(4);
+  await expect(reviews.reviews).toHaveCount(1);
   await expect(reviews.reviews.first()).toContainText(sample);
   await expect(reviews.reviews.first().getByRole("img")).toHaveCount(1);
   await expect(reviews.reviews.first().getByRole("img")).toHaveAttribute(
@@ -55,6 +54,6 @@ test("review validation and keyboard rating work; a safe local review is lost on
   ).toEqual({ local: 0, session: 0 });
   await expect(reviews.comment).toHaveValue("");
   await page.reload({ waitUntil: "domcontentloaded" });
-  await expect(reviews.reviews).toHaveCount(3);
+  await expect(reviews.reviews).toHaveCount(0);
   await expect(page.getByText(sample, { exact: false })).toHaveCount(0);
 });

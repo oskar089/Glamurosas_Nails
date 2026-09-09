@@ -161,7 +161,7 @@ describe("reviewSchema", () => {
       const result = reviewSchema.safeParse({ rating: 5, comment });
       expect(result.success).toBe(false);
       expect(issueMessages(result)).toContain(
-        "Escribe al menos 10 caracteres para tu reseña de demostración.",
+        "Escribe al menos 10 caracteres para tu reseña.",
       );
     }
   });
@@ -173,7 +173,7 @@ describe("reviewSchema", () => {
     });
     expect(result.success).toBe(false);
     expect(issueMessages(result)).toContain(
-      "Mantén tu reseña de demostración por debajo de 600 caracteres.",
+      "Mantén tu reseña por debajo de 600 caracteres.",
     );
   });
 

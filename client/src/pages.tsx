@@ -6,7 +6,6 @@ import {
   Arrow,
   BookingCallout,
   Photo,
-  ReviewCard,
   SectionHeading,
   ServiceCard,
   Sparkle,
@@ -14,13 +13,7 @@ import {
 import { AppErrorFallback } from "./error-boundary";
 import { Booking, Reviews } from "./forms";
 import type { CategoryId } from "./models/types";
-import {
-  categories,
-  exampleReviews,
-  isCategoryId,
-  photos,
-  services,
-} from "./services/content";
+import { categories, isCategoryId, photos, services } from "./services/content";
 
 function Home() {
   return (
@@ -113,7 +106,8 @@ function Home() {
           ))}
         </div>
         <p className="section-note">
-          Vista previa de servicios. No es un menú en vivo.
+          Elegí el servicio que más va con tu momento y consultá disponibilidad
+          para reservar.
         </p>
       </section>
       <section className="inspiration-section">
@@ -160,24 +154,15 @@ function Home() {
           eyebrow="PALABRAS PEQUEÑAS, SENSACIONES BONITAS"
           title={
             <>
-              El tipo de sensación <em>que imaginamos.</em>
+              Queremos leer <em>tu experiencia.</em>
             </>
           }
-          description="Historias de ejemplo para mostrar cómo este espacio celebrará tus experiencias."
+          description="Cada reseña real ayuda a que otra persona reserve con más confianza y cercanía."
         >
           <Link className="text-link" to="/reviews">
-            Explora reseñas de demostración <Arrow />
+            Dejar una reseña <Arrow />
           </Link>
         </SectionHeading>
-        <div className="review-grid">
-          {exampleReviews.slice(0, 2).map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
-        </div>
-        <p className="section-note">
-          Solo texto de demostración. No hay testimonios reales de clientes ni
-          valoraciones verificadas.
-        </p>
       </section>
       <BookingCallout />
     </>
@@ -202,15 +187,12 @@ function Services() {
           Aquí empieza tu próximo conjunto.
         </p>
       </PageIntro>
-      <section
-        className="container page-section"
-        aria-label="Servicios de ejemplo"
-      >
+      <section className="container page-section" aria-label="Servicios">
         <div className="notice">
           <Sparkle />
           <p>
-            <strong>Un primer vistazo al menú.</strong> Los servicios son una
-            vista previa, no detalles confirmados.
+            <strong>Elegí tu próximo acabado.</strong> Estos servicios te ayudan
+            a encontrar el estilo ideal antes de reservar.
           </p>
         </div>
         <div className="service-grid service-grid-full">
@@ -367,9 +349,8 @@ function Contact() {
             <em>personal. Pronto.</em>
           </h2>
           <p>
-            Los datos de contacto del salón llegarán pronto. No hay una
-            dirección, teléfono, correo electrónico ni horario de apertura
-            confirmados en esta vista previa.
+            Reservá tu cita desde Google Calendar y consultá los canales de
+            contacto disponibles para coordinar tu experiencia.
           </p>
           <dl>
             <div>

@@ -206,13 +206,13 @@ export function ReviewCard({ review }: ReviewCardProps) {
           <span className="empty-stars">{"☆".repeat(5 - review.rating)}</span>
         </span>
         <span className="demo-tag">
-          {review.example ? "Reseña de ejemplo" : "Tu demostración local"}
+          {review.example ? "Reseña de ejemplo" : "Reseña compartida"}
         </span>
       </div>
       <blockquote>“{review.comment}”</blockquote>
       <div className="review-author">
         <span className="review-initial" aria-hidden="true">
-          {review.example ? "g" : "y"}
+          {review.example ? "g" : "t"}
         </span>
         <div>
           <h3>{review.name}</h3>

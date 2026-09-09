@@ -16,14 +16,12 @@ export const reviewSchema = z.object({
     if (length < 10) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          "Escribe al menos 10 caracteres para tu reseña de demostración.",
+        message: "Escribe al menos 10 caracteres para tu reseña.",
       });
     } else if (length > 600) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          "Mantén tu reseña de demostración por debajo de 600 caracteres.",
+        message: "Mantén tu reseña por debajo de 600 caracteres.",
       });
     }
   }),

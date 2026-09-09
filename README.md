@@ -1,10 +1,10 @@
-# Glamurosas Nails — vista previa visual con reservas en Google Calendar
+# Glamurosas Nails — sitio web de reservas
 
-Concepto de estudio de uñas liderado por fotos, con diseño editorial crema y borgoña. Esta versión incluye un cliente React/TypeScript y un backend Fastify que conserva rutas demostrativas no usadas por el flujo de reserva actual.
+Sitio web de Glamurosas Nails con diseño editorial crema y borgoña, navegación por servicios, galería de inspiración y reservas mediante Google Calendar. La versión pública se despliega como cliente React/TypeScript en Vercel.
 
 ## 🚀 Ejecutar localmente
 
-Requisitos: Node.js **22.12+ o 24+** y pnpm. Probado con Node **24.16.0** y pnpm **11.8.0**.
+Requisitos: Node.js **22.x** y pnpm **11.8.0**.
 
 Desde la raíz del proyecto:
 
@@ -39,23 +39,23 @@ pnpm run preview
 
 | Ruta        | Experiencia                                                                                                                   |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `/`         | Portada editorial, servicios, inspiración, reseñas de muestra y enlaces hacia la reserva.                                    |
-| `/services` | Tres servicios de ejemplo: manicura refuerzo, acrílicas y pedicura; los enlaces pueden reflejar el servicio elegido.          |
-| `/gallery`  | Seis composiciones de imágenes de banco con filtros: todos, acrílico, gel, arte de uñas y clásico.                            |
+| `/`         | Portada editorial, servicios, inspiración visual y enlaces hacia la reserva.                                                  |
+| `/services` | Servicios destacados: manicura refuerzo, acrílicas y pedicura; los enlaces pueden reflejar el servicio elegido.               |
+| `/gallery`  | Composiciones de inspiración con filtros: todos, acrílico, gel, arte de uñas y clásico.                                       |
 | `/booking`  | CTA hacia Google Calendar, que muestra la disponibilidad y gestiona los datos de la reserva.                                  |
-| `/reviews`  | Tres reseñas de muestra y formulario accesible de 1–5 estrellas; los comentarios se guardan solo en memoria del cliente.      |
-| `/contact`  | Estado honesto de “próximamente”, sin ubicación, canales de contacto u horarios falsificados.                                |
+| `/reviews`  | Formulario accesible de 1–5 estrellas para compartir una reseña.                                                              |
+| `/contact`  | Página de contacto preparada para completar con ubicación, canales y horarios reales.                                         |
 | Otras rutas | Página de ruta no encontrada con enlace al inicio.                                                                            |
 
 La navegación incluye menú móvil accesible, enlace para saltar al contenido, estados de foco visibles y foco del área principal al cambiar de ruta. Los diseños se adaptan a pantallas pequeñas y respetan la preferencia de movimiento reducido.
 
-## 🔒 Límites de demo y privacidad
+## 🔒 Privacidad y alcance
 
 - La página de reserva no recopila datos personales localmente. El enlace abre Google Calendar, donde se muestran los horarios disponibles y se gestionan los datos de la cita.
 - La disponibilidad y los datos enviados en Google Calendar se rigen por las políticas de Google.
-- Las reseñas son ejemplos ficticios, no testimonios reales. Una reseña enviada se agrega solo a la memoria del cliente, sobrevive a la navegación interna y desaparece al recargar.
-- Los servicios son una vista previa y no representan una oferta confirmada del salón.
-- No hay analítica ni autenticación. El backend demostrativo no participa del flujo de reserva actual y necesitaría endurecimiento antes de producción pública.
+- El formulario de reseñas no integra todavía una base de datos pública; las reseñas visibles se manejan en la sesión del navegador.
+- No hay analítica ni autenticación en el cliente público.
+- El backend Fastify incluido en el repositorio se conserva para desarrollo local y futuras integraciones, pero el despliegue actual de Vercel sirve el cliente estático.
 
 ## ✅ Verificación
 
@@ -70,7 +70,7 @@ pnpm test
 
 La suite de Playwright se ejecuta contra la vista previa de producción en el puerto **4173**, inicia y detiene su propio servidor, y no reutiliza otro servidor en ejecución. Dejá libre el puerto 4173 antes de correrla.
 
-La vista previa de producción envía una Política de Seguridad de Contenido restrictiva: scripts y conexiones de mismo origen, con solo los proveedores documentados de imágenes y fuentes permitidos para archivos externos. Vite mantiene su comportamiento normal de recarga en caliente durante desarrollo; un host desplegado debe reproducir los encabezados de seguridad definidos en `client/vite.config.js`.
+La versión desplegada envía una Política de Seguridad de Contenido restrictiva: scripts y conexiones de mismo origen, con solo los proveedores documentados de imágenes y fuentes permitidos para archivos externos. Vite mantiene su comportamiento normal de recarga en caliente durante desarrollo; Vercel reproduce estos encabezados desde `vercel.json`.
 
 Las pruebas de comportamiento bloquean solicitudes de terceros desde la navegación inicial para aislar la aplicación, incluyendo tráfico observado por software antivirus en páginas HTTP locales. Las pruebas de referencia visual conservan el acceso externo para la fotografía y las fuentes reales.
 
@@ -115,11 +115,10 @@ La fotografía se enlaza directamente desde `images.unsplash.com`; **es inspirac
 
 Las imágenes usan dimensiones explícitas y proporciones de recorte. La imagen principal carga con prioridad; las demás imágenes se cargan de forma diferida. Las imágenes fallidas muestran un reemplazo visual con marca y etiqueta. Las categorías de estilo son agrupaciones de inspiración, no técnicas verificadas.
 
-DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sistema sans-serif/Georgia. Los proveedores externos de imágenes y fuentes reciben solicitudes ordinarias de archivos externos. Google Calendar recibe los datos que la persona complete al usar el enlace de reserva. Antes de un lanzamiento público, reemplazá la fotografía de banco con activos aprobados del salón y confirmá licencias y requisitos de privacidad.
+DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sistema sans-serif/Georgia. Los proveedores externos de imágenes y fuentes reciben solicitudes ordinarias de archivos externos. Google Calendar recibe los datos que la persona complete al usar el enlace de reserva. Para fortalecer la marca, reemplazá progresivamente la fotografía de banco con activos aprobados del salón y confirmá licencias y requisitos de privacidad.
 
 ## 📈 Próximos pasos reales
 
-1. Hacer push de los commits locales cuando decidas publicar esta rama.
-2. Definir datos reales del salón: fotos aprobadas, servicios, precios, ubicación, horarios y canales de contacto.
-3. Antes de producción pública: agregar variables de entorno, protección de abuso, estrategia de backups, base de datos administrada y flujo de despliegue.
-4. Para una fase comercial: definir la gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.
+1. Completar datos finales del salón: fotos aprobadas, ubicación, horarios y canales de contacto.
+2. Integrar almacenamiento real para reseñas si se quieren publicar testimonios permanentes.
+3. Para una fase comercial: definir gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.

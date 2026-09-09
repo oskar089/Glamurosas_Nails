@@ -146,7 +146,7 @@ test("small screens and reduced motion retain usable controls", async ({
     ).toBe(true);
   }
   const submit = page.getByRole("button", {
-    name: "Añadir una reseña de demostración",
+    name: "Compartir mi experiencia",
   });
   expect(
     await submit.evaluate(
