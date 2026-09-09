@@ -134,6 +134,15 @@ export function Footer() {
           >
             WhatsApp 643 521 975 <Arrow diagonal />
           </a>
+          <br />
+          <a
+            className="text-link"
+            href="https://www.instagram.com/nailskarent.sevilla/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Instagram @nailskarent.sevilla <Arrow diagonal />
+          </a>
         </div>
       </div>
       <div className="footer-bottom">

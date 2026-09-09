@@ -108,6 +108,14 @@ describe("Google Calendar booking copy", () => {
     })) {
       expect(whatsappLink).toHaveAttribute("href", "https://wa.me/34643521975");
     }
+    for (const instagramLink of screen.getAllByRole("link", {
+      name: "Instagram @nailskarent.sevilla",
+    })) {
+      expect(instagramLink).toHaveAttribute(
+        "href",
+        "https://www.instagram.com/nailskarent.sevilla/",
+      );
+    }
     expect(
       screen.getAllByRole("link", { name: "Solicita tu cita" }),
     ).toHaveLength(2);

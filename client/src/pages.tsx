@@ -349,8 +349,8 @@ function Contact() {
             <em>personal.</em>
           </h2>
           <p>
-            Reservá tu cita desde Google Calendar o escribinos por WhatsApp para
-            coordinar tu experiencia en Zona Amate.
+            Reservá tu cita desde Google Calendar, escribinos por WhatsApp o
+            seguí el trabajo del salón en Instagram.
           </p>
           <dl>
             <div>
@@ -367,6 +367,15 @@ function Contact() {
                   rel="noreferrer"
                 >
                   WhatsApp 643 521 975 <Arrow diagonal />
+                </a>
+                <br />
+                <a
+                  className="text-link"
+                  href="https://www.instagram.com/nailskarent.sevilla/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Instagram @nailskarent.sevilla <Arrow diagonal />
                 </a>
               </dd>
             </div>

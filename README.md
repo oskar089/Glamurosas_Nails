@@ -44,7 +44,7 @@ pnpm run preview
 | `/gallery`  | Composiciones de inspiración con filtros: todos, acrílico, gel, arte de uñas y clásico.                                       |
 | `/booking`  | CTA hacia Google Calendar, que muestra la disponibilidad y gestiona los datos de la reserva.                                  |
 | `/reviews`  | Formulario accesible de 1–5 estrellas para compartir una reseña.                                                              |
-| `/contact`  | Página de contacto con Zona Amate, WhatsApp 643 521 975 y horario de 9:30 a. m. a 6:00 p. m.                                |
+| `/contact`  | Página de contacto con Zona Amate, WhatsApp 643 521 975, Instagram y horario de 9:30 a. m. a 6:00 p. m.                      |
 | Otras rutas | Página de ruta no encontrada con enlace al inicio.                                                                            |
 
 La navegación incluye menú móvil accesible, enlace para saltar al contenido, estados de foco visibles y foco del área principal al cambiar de ruta. Los diseños se adaptan a pantallas pequeñas y respetan la preferencia de movimiento reducido.
@@ -119,6 +119,6 @@ DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sist
 
 ## 📈 Próximos pasos reales
 
-1. Reemplazar la fotografía de banco por fotos aprobadas del salón cuando estén disponibles.
+1. Reemplazar la fotografía de banco por fotos aprobadas del Instagram del salón cuando estén disponibles.
 2. Integrar almacenamiento real para reseñas si se quieren publicar testimonios permanentes.
 3. Para una fase comercial: definir gestión de confirmaciones, autenticación de administrador y panel de reservas que complemente Google Calendar.
