@@ -125,7 +125,7 @@ export function Footer() {
         </div>
         <div>
           <h2>Mantengámonos en contacto</h2>
-          <p>Zona Amate · 9:30 a. m. a 6:00 p. m.</p>
+          <p>Zona Amate · Lunes a viernes, 9:30 a. m. a 6:00 p. m.</p>
           <a
             className="text-link"
             href="https://wa.me/34643521975"

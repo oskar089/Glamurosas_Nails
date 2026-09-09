@@ -102,7 +102,9 @@ describe("Google Calendar booking copy", () => {
     renderApp("/contact");
 
     expect(screen.getByText("Zona Amate")).toBeInTheDocument();
-    expect(screen.getByText("De 9:30 a. m. a 6:00 p. m.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Lunes a viernes, de 9:30 a. m. a 6:00 p. m."),
+    ).toBeInTheDocument();
     for (const whatsappLink of screen.getAllByRole("link", {
       name: "WhatsApp 643 521 975",
     })) {

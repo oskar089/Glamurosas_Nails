@@ -29,6 +29,16 @@ export const services: Service[] = [
     note: "DA FORMA A TU ESTILO",
   },
   {
+    id: "gel",
+    name: "Semipermanentes",
+    shortName: "Semipermanentes",
+    description:
+      "Color duradero, brillo cuidado y un acabado limpio para llevar tus manos bonitas por más tiempo.",
+    price: 30,
+    duration: 50,
+    note: "COLOR QUE ACOMPAÑA",
+  },
+  {
     id: "nail-art",
     name: "Pedicura",
     shortName: "Pedicura",

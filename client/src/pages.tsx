@@ -381,7 +381,7 @@ function Contact() {
             </div>
             <div>
               <dt>Horario</dt>
-              <dd>De 9:30 a. m. a 6:00 p. m.</dd>
+              <dd>Lunes a viernes, de 9:30 a. m. a 6:00 p. m.</dd>
             </div>
           </dl>
           <Link className="button" to="/booking">

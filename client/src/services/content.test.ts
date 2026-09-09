@@ -60,8 +60,8 @@ describe("localDateString", () => {
 });
 
 describe("services data", () => {
-  it("has three services with unique, typed ids", () => {
-    expect(services).toHaveLength(3);
+  it("has four services with unique, typed ids", () => {
+    expect(services).toHaveLength(4);
     expect(allUnique(services.map((service) => service.id))).toBe(true);
     for (const service of services) {
       expect(SERVICE_IDS).toContain(service.id);
