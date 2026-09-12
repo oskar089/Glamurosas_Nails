@@ -74,6 +74,7 @@ Las migraciones de Supabase están en:
 supabase/migrations/20260402120000_create_reviews.sql
 supabase/migrations/20260402123000_add_review_admins.sql
 supabase/migrations/20260402130000_create_booking_requests.sql
+supabase/migrations/20260402131000_lock_down_rls_auto_enable.sql
 ```
 
 Para administrar reseñas y solicitudes de reserva:
@@ -146,5 +147,4 @@ DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sist
 ## 📈 Próximos pasos reales
 
 1. Reemplazar la fotografía de banco por fotos aprobadas del Instagram del salón cuando estén disponibles.
-2. Crear gestión de reservas que complemente Google Calendar.
-3. Reemplazar progresivamente las fotos de banco por fotos aprobadas del salón.
+2. Agregar acciones en `/admin` para marcar solicitudes de reserva como contactadas o cerradas.
