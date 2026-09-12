@@ -51,6 +51,14 @@ export interface BookingFormValues {
   time: string;
 }
 
+export interface BookingRequestFormValues {
+  name: string;
+  email: string;
+  phone: string;
+  service: string;
+  notes: string;
+}
+
 export interface ReviewFormValues {
   name: string;
   rating: number;

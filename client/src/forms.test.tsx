@@ -65,7 +65,7 @@ describe("Booking", () => {
     );
     expect(calendarLink).toHaveAttribute("target", "_blank");
     expect(
-      screen.getByText(/Google Calendar muestra los horarios disponibles/),
+      screen.getByText(/Google Calendar es el único lugar donde elegís/),
     ).toBeInTheDocument();
   });
 
@@ -76,16 +76,110 @@ describe("Booking", () => {
     ).toBeInTheDocument();
   });
 
-  it("does not render a local booking form", () => {
-    renderBooking("/booking?service=unknown");
+  it("shows accessible errors for an incomplete request without removing Calendar", async () => {
+    const user = userEvent.setup();
+    renderBooking();
 
-    expect(screen.queryByRole("form")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Tu nombre")).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Enviar solicitud de reserva" }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Hay un detalle que requiere tu atención.",
+    );
     expect(
-      screen.queryByLabelText("Dirección de correo electrónico"),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Fecha preferida")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Hora preferida")).not.toBeInTheDocument();
+      screen.getByText("Introduce un teléfono válido.", { exact: true }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Ver disponibilidad en Google Calendar",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("stores a pending request and keeps Calendar as the slot picker", async () => {
+    const user = userEvent.setup();
+    const fetchMock = configureSupabaseReviews();
+    renderBooking("/booking?service=gel");
+
+    await user.type(screen.getByLabelText("Tu nombre (obligatorio)"), "Lucía");
+    await user.type(
+      screen.getByLabelText("Correo electrónico (obligatorio)"),
+      "lucia@example.com",
+    );
+    await user.type(
+      screen.getByLabelText("Teléfono (obligatorio)"),
+      "643 521 975",
+    );
+    await user.type(
+      screen.getByLabelText("Preferencias o notas (obligatorio)"),
+      "Prefiero un acabado natural y brillante.",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Enviar solicitud de reserva" }),
+    );
+
+    expect(
+      await screen.findByText(/Recibimos tu solicitud de reserva/),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "https://project.supabase.co/rest/v1/booking_requests",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            name: "Lucía",
+            email: "lucia@example.com",
+            phone: "643 521 975",
+            service: "gel",
+            notes: "Prefiero un acabado natural y brillante.",
+            status: "pending",
+          }),
+        }),
+      );
+    });
+    expect(
+      screen.getByRole("link", {
+        name: "Ver disponibilidad en Google Calendar",
+      }),
+    ).toHaveAttribute("href", GOOGLE_CALENDAR_APPOINTMENTS_URL);
+  });
+
+  it("keeps Calendar available when request submission is unavailable", async () => {
+    const user = userEvent.setup();
+    renderBooking();
+
+    await user.type(screen.getByLabelText("Tu nombre (obligatorio)"), "Lucía");
+    await user.type(
+      screen.getByLabelText("Correo electrónico (obligatorio)"),
+      "lucia@example.com",
+    );
+    await user.type(
+      screen.getByLabelText("Teléfono (obligatorio)"),
+      "643 521 975",
+    );
+    await user.selectOptions(
+      screen.getByLabelText("Servicio (obligatorio)"),
+      "gel",
+    );
+    await user.type(
+      screen.getByLabelText("Preferencias o notas (obligatorio)"),
+      "Prefiero un acabado natural y brillante.",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Enviar solicitud de reserva" }),
+    );
+
+    expect(
+      await screen.findByText(
+        "El formulario de solicitud no está disponible. Podés continuar en Google Calendar.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Ver disponibilidad en Google Calendar",
+      }),
+    ).toBeInTheDocument();
   });
 });
 

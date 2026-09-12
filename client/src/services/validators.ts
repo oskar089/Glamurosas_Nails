@@ -1,6 +1,60 @@
 import { z } from "zod";
-import type { BookingFormValues } from "../models/types";
+import type {
+  BookingFormValues,
+  BookingRequestFormValues,
+} from "../models/types";
 import { demoTimes, localDateString, services } from "./content";
+
+export const bookingRequestFormSchema = z.object({
+  name: z.string().superRefine((value, context) => {
+    const length = value.trim().length;
+    if (length < 2) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Introduce un nombre de al menos 2 caracteres.",
+      });
+    } else if (length > 80) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Mantén tu nombre por debajo de 80 caracteres.",
+      });
+    }
+  }),
+  email: z
+    .string()
+    .trim()
+    .email("Introduce una dirección de correo electrónico válida."),
+  phone: z.string().superRefine((value, context) => {
+    if (!/^[0-9+()\s-]{7,30}$/.test(value.trim())) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Introduce un teléfono válido.",
+      });
+    }
+  }),
+  service: z.string().superRefine((value, context) => {
+    if (!services.some((service) => service.id === value)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Elige un servicio.",
+      });
+    }
+  }),
+  notes: z.string().superRefine((value, context) => {
+    const length = value.trim().length;
+    if (length < 10) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Escribe al menos 10 caracteres sobre tu preferencia.",
+      });
+    } else if (length > 600) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Mantén tus notas por debajo de 600 caracteres.",
+      });
+    }
+  }),
+}) satisfies z.ZodType<BookingRequestFormValues>;
 
 export const reviewSchema = z.object({
   name: z.string().superRefine((value, context) => {

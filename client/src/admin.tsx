@@ -1,6 +1,10 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import {
+  type AdminBookingRequest,
+  getPendingBookingRequests,
+} from "./services/admin-bookings";
+import {
   type AdminReview,
   type AdminSession,
   clearAdminSession,
@@ -17,6 +21,9 @@ export function AdminReviews() {
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [pendingBookingRequests, setPendingBookingRequests] = useState<
+    AdminBookingRequest[]
+  >([]);
   const [pendingReviews, setPendingReviews] = useState<AdminReview[]>([]);
   const [publishedReviews, setPublishedReviews] = useState<AdminReview[]>([]);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,19 +32,40 @@ export function AdminReviews() {
 
   useEffect(() => {
     if (!session) return;
-    Promise.all([getPendingReviews(session), getPublishedReviews(session)])
-      .then(([loadedPendingReviews, loadedPublishedReviews]) => {
-        setPendingReviews(loadedPendingReviews);
-        setPublishedReviews(loadedPublishedReviews);
-        setError(null);
-      })
-      .catch((loadError: unknown) => {
+    Promise.allSettled([
+      getPendingBookingRequests(session),
+      getPendingReviews(session),
+      getPublishedReviews(session),
+    ]).then(
+      ([
+        bookingRequestsResult,
+        pendingReviewsResult,
+        publishedReviewsResult,
+      ]) => {
+        if (bookingRequestsResult.status === "fulfilled") {
+          setPendingBookingRequests(bookingRequestsResult.value);
+        }
+        if (pendingReviewsResult.status === "fulfilled") {
+          setPendingReviews(pendingReviewsResult.value);
+        }
+        if (publishedReviewsResult.status === "fulfilled") {
+          setPublishedReviews(publishedReviewsResult.value);
+        }
+
+        const firstRejectedResult = [
+          bookingRequestsResult,
+          pendingReviewsResult,
+          publishedReviewsResult,
+        ].find((result) => result.status === "rejected");
         setError(
-          loadError instanceof Error
-            ? loadError.message
-            : "No se pudieron cargar las reseñas pendientes.",
+          firstRejectedResult?.status === "rejected"
+            ? firstRejectedResult.reason instanceof Error
+              ? firstRejectedResult.reason.message
+              : "No se pudo cargar una parte del panel de administración."
+            : null,
         );
-      });
+      },
+    );
   }, [session]);
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
@@ -95,6 +123,7 @@ export function AdminReviews() {
   const handleLogout = () => {
     clearAdminSession();
     setSession(null);
+    setPendingBookingRequests([]);
     setPendingReviews([]);
     setPublishedReviews([]);
     setMessage(null);
@@ -106,7 +135,7 @@ export function AdminReviews() {
       <section className="container page-section">
         <div className="form-panel">
           <p className="eyebrow">PANEL PRIVADO</p>
-          <h1>Administrar reseñas</h1>
+          <h1>Administrar reseñas y reservas</h1>
           <p className="form-description">
             Iniciá sesión para aprobar o rechazar las reseñas pendientes.
           </p>
@@ -149,10 +178,10 @@ export function AdminReviews() {
     <section className="container page-section">
       <div className="form-panel">
         <p className="eyebrow">PANEL PRIVADO</p>
-        <h1>Reseñas pendientes</h1>
+        <h1>Panel de administración</h1>
         <p className="form-description">
-          Sesión iniciada como {session.email}. Revisá cada reseña antes de
-          publicarla.
+          Sesión iniciada como {session.email}. Revisá las solicitudes de
+          reserva y moderá las reseñas antes de publicarlas.
         </p>
         <button
           className="button button-small"
@@ -171,6 +200,53 @@ export function AdminReviews() {
             {error}
           </div>
         )}
+        <h2>Solicitudes de reserva pendientes</h2>
+        {pendingBookingRequests.length === 0 ? (
+          <p className="section-note">
+            No hay solicitudes de reserva pendientes.
+          </p>
+        ) : (
+          <ul
+            className="booking-request-list"
+            aria-label="Solicitudes de reserva pendientes"
+          >
+            {pendingBookingRequests.map((request) => (
+              <li key={request.id}>
+                <article className="booking-request-card">
+                  <div className="review-card-top">
+                    <h3>{request.name}</h3>
+                    <span className="demo-tag">Pendiente</span>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Servicio</dt>
+                      <dd>{request.service}</dd>
+                    </div>
+                    <div>
+                      <dt>Contacto</dt>
+                      <dd>
+                        <a href={`mailto:${request.email}`}>{request.email}</a>
+                        <br />
+                        <a href={`tel:${request.phone}`}>{request.phone}</a>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Recibida</dt>
+                      <dd>
+                        {new Date(request.createdAt).toLocaleDateString()}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Notas</dt>
+                      <dd>{request.notes}</dd>
+                    </div>
+                  </dl>
+                </article>
+              </li>
+            ))}
+          </ul>
+        )}
+        <h2>Reseñas pendientes</h2>
         {pendingReviews.length === 0 ? (
           <p className="section-note">No hay reseñas pendientes.</p>
         ) : (

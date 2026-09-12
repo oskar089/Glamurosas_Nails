@@ -12,11 +12,18 @@ import {
   ReviewCard,
   Sparkle,
 } from "./components/ui";
-import type { Review, ReviewFormValues } from "./models/types";
-import { GOOGLE_CALENDAR_APPOINTMENTS_URL } from "./services/booking";
+import type {
+  BookingRequestFormValues,
+  Review,
+  ReviewFormValues,
+} from "./models/types";
+import {
+  GOOGLE_CALENDAR_APPOINTMENTS_URL,
+  submitBookingRequest,
+} from "./services/booking";
 import { isServiceId, services } from "./services/content";
 import { getApprovedReviews, submitReview } from "./services/reviews";
-import { reviewSchema } from "./services/validators";
+import { bookingRequestFormSchema, reviewSchema } from "./services/validators";
 
 const REVIEW_FIELDS = ["name", "rating", "comment"] as const;
 
@@ -42,6 +49,43 @@ export function Booking() {
   const selectedService = isServiceId(preselection)
     ? services.find((service) => service.id === preselection)
     : undefined;
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<BookingRequestFormValues>({
+    resolver: zodResolver(bookingRequestFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      service: selectedService?.id ?? "",
+      notes: "",
+    },
+  });
+  const errorRecord = toErrorRecord(
+    ["name", "email", "phone", "service", "notes"] as const,
+    errors,
+  );
+
+  const onValidSubmit = async (data: BookingRequestFormValues) => {
+    setSubmitError(null);
+    try {
+      await submitBookingRequest(data);
+      reset({ name: "", email: "", phone: "", service: "", notes: "" });
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitted(false);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo enviar tu solicitud. Podés continuar en Google Calendar.",
+      );
+    }
+  };
 
   return (
     <>
@@ -54,7 +98,7 @@ export function Booking() {
         }
       >
         <p>
-          Consulta los horarios disponibles y reserva tu cita directamente en
+          Compartí tus preferencias y confirmá el horario exacto directamente en
           Google Calendar.
         </p>
       </PageIntro>
@@ -82,15 +126,15 @@ export function Booking() {
           <p>
             {selectedService
               ? selectedService.description
-              : "Explora los servicios y elige el horario que mejor te venga en Google Calendar."}
+              : "Contanos qué buscás y elegí el horario que mejor te venga en Google Calendar."}
           </p>
           <div className="privacy-note">
             <Sparkle />
             <div>
-              <h3>Google Calendar gestiona tu cita.</h3>
+              <h3>Google Calendar confirma tu cita.</h3>
               <p>
-                Consulta la disponibilidad y completa los datos de tu reserva
-                directamente en Google Calendar.
+                Tu solicitud nos ayuda a preparar la atención, pero el horario
+                solo queda confirmado en Google Calendar.
               </p>
             </div>
           </div>
@@ -100,16 +144,153 @@ export function Booking() {
         </aside>
         <div className="form-panel">
           <div className="form-heading">
-            <span className="step-label">01 — ELIGE TU HORARIO</span>
-            <span className="demo-tag">Google Calendar</span>
+            <span className="step-label">01 — CONTANOS TU PREFERENCIA</span>
+            <span className="demo-tag">Solicitud</span>
           </div>
-          <h2>Reserva tu momento.</h2>
+          <h2>Empezá tu reserva.</h2>
           <p className="form-description">
-            Google Calendar muestra los horarios disponibles y gestiona los
-            datos de tu cita.
+            Enviaremos esta solicitud al salón. Después, elegí y confirmá el
+            horario exacto en Google Calendar.
           </p>
+          {submitted && (
+            <div className="success-note" role="status">
+              Recibimos tu solicitud de reserva. Para completar tu cita, elegí y
+              confirmá el horario exacto en Google Calendar.
+            </div>
+          )}
+          {submitError && (
+            <div className="error-summary" role="alert">
+              {submitError}
+            </div>
+          )}
+          <ErrorSummary errors={errorRecord} />
+          <form noValidate onSubmit={handleSubmit(onValidSubmit)}>
+            <div className="field">
+              <label htmlFor="booking-name">Tu nombre (obligatorio)</label>
+              <input
+                id="booking-name"
+                type="text"
+                maxLength={80}
+                autoComplete="name"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                {...register("name", {
+                  onChange: () => {
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  },
+                })}
+              />
+              <FieldErrorMessage
+                id="name"
+                error={errors.name?.message ?? undefined}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="booking-email">
+                Correo electrónico (obligatorio)
+              </label>
+              <input
+                id="booking-email"
+                type="email"
+                maxLength={254}
+                autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
+                {...register("email", {
+                  onChange: () => {
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  },
+                })}
+              />
+              <FieldErrorMessage
+                id="email"
+                error={errors.email?.message ?? undefined}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="booking-phone">Teléfono (obligatorio)</label>
+              <input
+                id="booking-phone"
+                type="tel"
+                maxLength={30}
+                autoComplete="tel"
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "phone-error" : undefined}
+                {...register("phone", {
+                  onChange: () => {
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  },
+                })}
+              />
+              <FieldErrorMessage
+                id="phone"
+                error={errors.phone?.message ?? undefined}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="booking-service">Servicio (obligatorio)</label>
+              <select
+                id="booking-service"
+                aria-invalid={Boolean(errors.service)}
+                aria-describedby={errors.service ? "service-error" : undefined}
+                {...register("service", {
+                  onChange: () => {
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  },
+                })}
+              >
+                <option value="">Elegí un servicio</option>
+                {services.map((service) => (
+                  <option key={service.id} value={service.id}>
+                    {service.name}
+                  </option>
+                ))}
+              </select>
+              <FieldErrorMessage
+                id="service"
+                error={errors.service?.message ?? undefined}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="booking-notes">
+                Preferencias o notas (obligatorio)
+              </label>
+              <textarea
+                id="booking-notes"
+                rows={4}
+                maxLength={600}
+                placeholder="Por ejemplo, el estilo que te gustaría o cualquier preferencia."
+                aria-invalid={Boolean(errors.notes)}
+                aria-describedby={`booking-notes-hint${errors.notes ? " notes-error" : ""}`}
+                {...register("notes", {
+                  onChange: () => {
+                    setSubmitted(false);
+                    setSubmitError(null);
+                  },
+                })}
+              />
+              <span className="field-hint" id="booking-notes-hint">
+                No indiques un horario: lo confirmarás en Google Calendar.
+              </span>
+              <FieldErrorMessage
+                id="notes"
+                error={errors.notes?.message ?? undefined}
+              />
+            </div>
+            <button
+              className="button button-full"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              Enviar solicitud de reserva <Arrow />
+            </button>
+          </form>
           <a
-            className="button button-full"
+            className="button button-full button-secondary"
             href={GOOGLE_CALENDAR_APPOINTMENTS_URL}
             target="_blank"
             rel="noreferrer"
@@ -117,8 +298,8 @@ export function Booking() {
             Ver disponibilidad en Google Calendar <Arrow diagonal />
           </a>
           <p className="submit-note">
-            Se abrirá Google Calendar para elegir y confirmar el horario de tu
-            cita.
+            Google Calendar es el único lugar donde elegís y confirmás el
+            horario de tu cita.
           </p>
         </div>
       </section>

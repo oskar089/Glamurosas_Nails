@@ -4,7 +4,11 @@ import {
   createBookingSchema,
 } from "@glamurosas/shared";
 import { describe, expect, it } from "vitest";
-import { reviewSchema, validateBooking } from "./validators";
+import {
+  bookingRequestFormSchema,
+  reviewSchema,
+  validateBooking,
+} from "./validators";
 
 const TODAY = "2026-09-07";
 
@@ -129,6 +133,42 @@ describe("bookingRequestSchema", () => {
     });
     expect(result.success).toBe(false);
     expect(issueMessages(result)).toContain("Elige hoy o una fecha futura.");
+  });
+});
+
+const VALID_BOOKING_REQUEST = {
+  name: "Lucía",
+  email: "lucia@example.com",
+  phone: "643 521 975",
+  service: "gel",
+  notes: "Prefiero un acabado natural y brillante.",
+} as const;
+
+describe("bookingRequestFormSchema", () => {
+  it("accepts a complete booking request", () => {
+    expect(
+      bookingRequestFormSchema.safeParse(VALID_BOOKING_REQUEST).success,
+    ).toBe(true);
+  });
+
+  it("requires valid contact details, a service and a preference", () => {
+    const result = bookingRequestFormSchema.safeParse({
+      name: "A",
+      email: "invalid-email",
+      phone: "123",
+      service: "",
+      notes: "short",
+    });
+
+    expect(issueMessages(result)).toEqual(
+      expect.arrayContaining([
+        "Introduce un nombre de al menos 2 caracteres.",
+        "Introduce una dirección de correo electrónico válida.",
+        "Introduce un teléfono válido.",
+        "Elige un servicio.",
+        "Escribe al menos 10 caracteres sobre tu preferencia.",
+      ]),
+    );
   });
 });
 

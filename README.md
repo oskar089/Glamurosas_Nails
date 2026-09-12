@@ -42,7 +42,7 @@ pnpm run preview
 | `/`         | Portada editorial, servicios, inspiración visual y enlaces hacia la reserva.                                                  |
 | `/services` | Servicios destacados: manicura refuerzo, acrílicas, semipermanentes y pedicura; los enlaces pueden reflejar el servicio elegido. |
 | `/gallery`  | Composiciones de inspiración con filtros: todos, acrílico, gel, arte de uñas y clásico.                                       |
-| `/booking`  | CTA hacia Google Calendar, que muestra la disponibilidad y gestiona los datos de la reserva.                                  |
+| `/booking`  | Formulario de solicitud para el salón y CTA hacia Google Calendar, que sigue mostrando y confirmando la disponibilidad exacta. |
 | `/reviews`  | Formulario accesible de 1–5 estrellas para compartir una reseña.                                                              |
 | `/contact`  | Página de contacto con Zona Amate, WhatsApp 643 521 975, Instagram y horario de lunes a viernes, 9:30 a. m. a 6:00 p. m.     |
 | Otras rutas | Página de ruta no encontrada con enlace al inicio.                                                                            |
@@ -51,8 +51,8 @@ La navegación incluye menú móvil accesible, enlace para saltar al contenido, 
 
 ## 🔒 Privacidad y alcance
 
-- La página de reserva no recopila datos personales localmente. El enlace abre Google Calendar, donde se muestran los horarios disponibles y se gestionan los datos de la cita.
-- La disponibilidad y los datos enviados en Google Calendar se rigen por las políticas de Google.
+- La página de reserva guarda en Supabase una solicitud `pending` con los datos de contacto, servicio y preferencias para que el salón pueda hacer seguimiento. Esta solicitud no reserva ni bloquea un horario.
+- Google Calendar sigue siendo el único lugar donde se muestran, eligen y confirman los horarios. La disponibilidad y los datos enviados allí se rigen por las políticas de Google.
 - Las reseñas se guardan en Supabase como `pending` y solo se muestran cuando estén aprobadas.
 - No hay analítica ni autenticación en el cliente público.
 - El backend Fastify incluido en el repositorio se conserva para desarrollo local y futuras integraciones, pero el despliegue actual de Vercel sirve el cliente estático.
@@ -73,14 +73,15 @@ Las migraciones de Supabase están en:
 ```txt
 supabase/migrations/20260402120000_create_reviews.sql
 supabase/migrations/20260402123000_add_review_admins.sql
+supabase/migrations/20260402130000_create_booking_requests.sql
 ```
 
-Para administrar reseñas:
+Para administrar reseñas y solicitudes de reserva:
 
 1. Creá un usuario en `Authentication → Users`.
 2. Copiá su `User UID`.
 3. Insertalo en `public.review_admins`.
-4. Entrá a `/admin` con ese email y contraseña.
+4. Entrá a `/admin` con ese email y contraseña. El panel muestra las solicitudes de reserva pendientes; el horario se confirma siempre en Google Calendar.
 
 ## ✅ Verificación
 
@@ -118,7 +119,7 @@ Ambos navegadores deben instalarse por separado; este repositorio no los descarg
 | ------------------------------- | ----------------------------------------------------------------- |
 | `client/src/main.tsx`           | Inicio de React y configuración del router.                       |
 | `client/src/pages.tsx`          | Páginas visuales principales.                                     |
-| `client/src/forms.tsx`          | CTA de reserva en Google Calendar y formulario de reseñas.        |
+| `client/src/forms.tsx`          | Solicitud de reserva, CTA de Google Calendar y formulario de reseñas. |
 | `client/src/components/`        | Distribución y componentes UI compartidos.                        |
 | `client/src/services/`          | Contenido, validadores y cliente API.                             |
 | `client/src/styles.css`         | Sistema visual y estilos adaptables/reduced-motion.               |
