@@ -12,6 +12,8 @@
   --line: #e4d9d4;
   --blush: #f2e6e2;
   --serif: "Playfair Display", Georgia, serif;
+  --soft-shadow: 0 24px 70px rgb(82 42 55 / 0.16);
+  --lifted-shadow: 0 34px 90px rgb(82 42 55 / 0.22);
 }
 * {
   box-sizing: border-box;
@@ -298,6 +300,7 @@ p {
 }
 .hero-copy {
   padding-block: 20px;
+  animation: soft-rise 0.8s ease both;
 }
 .hero-copy .eyebrow {
   display: flex;
@@ -320,6 +323,7 @@ p {
   color: #b98b94;
   vertical-align: top;
   margin-top: 30px;
+  animation: sparkle-drift 4.8s ease-in-out infinite;
 }
 .hero h1 em {
   display: inline-block;
@@ -378,6 +382,8 @@ p {
   position: relative;
   padding-left: 12px;
   padding-right: 15px;
+  perspective: 1100px;
+  animation: soft-rise 0.9s ease 0.1s both;
 }
 .hero-photo-wrap {
   position: relative;
@@ -385,6 +391,16 @@ p {
   border-radius: 46% 46% 3px 3px;
   overflow: hidden;
   background: #ead5cd;
+  box-shadow: var(--soft-shadow);
+  transform: rotateY(-4deg) rotateX(2deg) translateZ(0);
+  transform-style: preserve-3d;
+  transition:
+    box-shadow 0.45s ease,
+    transform 0.45s ease;
+}
+.hero-photo-wrap:hover {
+  box-shadow: var(--lifted-shadow);
+  transform: rotateY(0deg) rotateX(0deg) translateY(-8px) translateZ(20px);
 }
 .photo {
   overflow: hidden;
@@ -396,7 +412,9 @@ p {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.65s ease;
+  transition:
+    filter 0.45s ease,
+    transform 0.65s ease;
 }
 .hero-photo-wrap > .photo {
   width: 100%;
@@ -405,6 +423,10 @@ p {
 }
 .hero-photo-wrap > .photo img {
   object-position: 50% 50%;
+}
+.hero-photo-wrap:hover > .photo img {
+  filter: saturate(1.08) contrast(1.04);
+  transform: scale(1.045);
 }
 .hero-photo-wrap::after {
   content: "";
@@ -420,6 +442,7 @@ p {
   left: 30px;
   right: 30px;
   color: white;
+  transform: translateZ(42px);
 }
 .hero-photo-label > span {
   font-size: 8px;
@@ -457,6 +480,8 @@ p {
   justify-content: center;
   transform: rotate(-12deg);
   color: var(--wine);
+  box-shadow: 0 18px 45px rgb(82 42 55 / 0.14);
+  animation: seal-float 5.6s ease-in-out infinite;
 }
 .hero-seal > span:not(.seal-g) {
   font-size: 7px;
@@ -490,6 +515,7 @@ p {
   align-items: center;
   justify-content: center;
   gap: clamp(22px, 4vw, 65px);
+  animation: soft-rise 0.75s ease 0.2s both;
 }
 .values-strip > span {
   font-size: 11px;
@@ -533,13 +559,19 @@ p {
   background: #fdfaf7;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 12px 34px rgb(82 42 55 / 0.04);
+  transform: translateZ(0);
   transition:
     border-color 0.2s,
-    background 0.2s;
+    background 0.2s,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
 }
 .service-card:hover {
   border-color: #cfa9b2;
   background: #fffaf7;
+  box-shadow: 0 24px 54px rgb(82 42 55 / 0.12);
+  transform: translateY(-7px) rotateX(1.5deg);
 }
 .service-card-top {
   display: flex;
@@ -598,10 +630,15 @@ p {
   height: 41px;
   border-radius: 50%;
   color: var(--wine);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 .icon-link:hover {
   background: var(--wine);
   color: white;
+  transform: rotate(-10deg) scale(1.05);
 }
 .section-note {
   margin-top: 18px;
@@ -616,15 +653,32 @@ p {
   grid-template-columns: 1fr 1.08fr 1fr;
   gap: 25px;
   align-items: start;
+  perspective: 1000px;
+}
+.inspiration-card {
+  display: block;
+  transform: translateZ(0);
+  transition: transform 0.35s ease;
 }
 .inspiration-card:nth-child(2) {
   margin-top: 37px;
 }
 .inspiration-card .photo {
   aspect-ratio: 0.88;
+  box-shadow: 0 16px 45px rgb(82 42 55 / 0.1);
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+.inspiration-card:hover {
+  transform: translateY(-6px);
+}
+.inspiration-card:hover .photo {
+  box-shadow: 0 27px 66px rgb(82 42 55 / 0.18);
+  transform: rotateY(3deg) rotateX(2deg);
 }
 .inspiration-card:hover img {
-  transform: scale(1.035);
+  transform: scale(1.045);
 }
 .inspiration-card > div:last-child {
   display: flex;
@@ -1376,6 +1430,34 @@ p {
   font-size: 10px;
 }
 
+@keyframes soft-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes sparkle-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(8deg);
+  }
+}
+@keyframes seal-float {
+  0%,
+  100% {
+    transform: rotate(-12deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-8deg) translateY(-9px);
+  }
+}
 @media (min-width: 1600px) {
   .hero {
     padding-block: 80px 65px;
@@ -2130,6 +2212,14 @@ p {
     animation: none !important;
   }
   .button:hover,
+  .hero-photo-wrap,
+  .hero-photo-wrap:hover,
+  .hero-photo-label,
+  .hero-seal,
+  .service-card:hover,
+  .icon-link:hover,
+  .inspiration-card:hover,
+  .inspiration-card:hover .photo,
   .inspiration-card:hover img {
     transform: none;
   }
