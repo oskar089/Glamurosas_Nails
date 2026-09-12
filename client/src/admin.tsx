@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   type AdminBookingRequest,
   getPendingBookingRequests,
+  updateBookingRequestStatus,
 } from "./services/admin-bookings";
 import {
   type AdminReview,
@@ -115,6 +116,35 @@ export function AdminReviews() {
           moderationError instanceof Error
             ? moderationError.message
             : "No se pudo actualizar la reseña.",
+        );
+      })
+      .finally(() => setBusyId(null));
+  };
+
+  const handleBookingRequestUpdate = (
+    request: AdminBookingRequest,
+    status: "followed_up" | "closed",
+  ) => {
+    if (!session) return;
+    setBusyId(request.id);
+    setError(null);
+    setMessage(null);
+    updateBookingRequestStatus(session, request.id, status)
+      .then(() => {
+        setPendingBookingRequests((current) =>
+          current.filter((item) => item.id !== request.id),
+        );
+        setMessage(
+          status === "followed_up"
+            ? "Solicitud marcada como contactada."
+            : "Solicitud cerrada.",
+        );
+      })
+      .catch((bookingRequestError: unknown) => {
+        setError(
+          bookingRequestError instanceof Error
+            ? bookingRequestError.message
+            : "No se pudo actualizar la solicitud de reserva.",
         );
       })
       .finally(() => setBusyId(null));
@@ -241,6 +271,28 @@ export function AdminReviews() {
                       <dd>{request.notes}</dd>
                     </div>
                   </dl>
+                  <div className="form-actions">
+                    <button
+                      className="button button-small"
+                      type="button"
+                      disabled={busyId === request.id}
+                      onClick={() =>
+                        handleBookingRequestUpdate(request, "followed_up")
+                      }
+                    >
+                      Marcar contactada
+                    </button>
+                    <button
+                      className="button button-small button-secondary"
+                      type="button"
+                      disabled={busyId === request.id}
+                      onClick={() =>
+                        handleBookingRequestUpdate(request, "closed")
+                      }
+                    >
+                      Cerrar solicitud
+                    </button>
+                  </div>
                 </article>
               </li>
             ))}

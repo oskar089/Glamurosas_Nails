@@ -147,4 +147,3 @@ DM Sans y Playfair Display se cargan desde Google Fonts con alternativas de sist
 ## 📈 Próximos pasos reales
 
 1. Reemplazar la fotografía de banco por fotos aprobadas del Instagram del salón cuando estén disponibles.
-2. Agregar acciones en `/admin` para marcar solicitudes de reserva como contactadas o cerradas.

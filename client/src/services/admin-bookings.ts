@@ -14,6 +14,8 @@ interface AdminBookingRequestRow {
   created_at: unknown;
 }
 
+export type BookingRequestAdminStatus = "followed_up" | "closed";
+
 export interface AdminBookingRequest {
   id: string;
   name: string;
@@ -88,4 +90,36 @@ export async function getPendingBookingRequests(
   return data.flatMap(
     (row) => toAdminBookingRequest(row as AdminBookingRequestRow) ?? [],
   );
+}
+
+export async function updateBookingRequestStatus(
+  session: AdminSession,
+  requestId: string,
+  status: BookingRequestAdminStatus,
+): Promise<void> {
+  const config = getSupabaseConfig();
+  if (!config) {
+    throw new Error("Supabase no está configurado.");
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `${config.url}${BOOKING_REQUESTS_ENDPOINT}?id=eq.${encodeURIComponent(requestId)}`,
+      {
+        method: "PATCH",
+        headers: {
+          ...supabaseHeaders(config, session.accessToken),
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ status }),
+      },
+    );
+  } catch {
+    throw new Error("No se pudo actualizar la solicitud de reserva.");
+  }
+
+  if (!response.ok) {
+    throw new Error("No se pudo actualizar la solicitud de reserva.");
+  }
 }
